@@ -33,7 +33,7 @@ app.message('hello', async ({ message, say }) => {
           },
           "action_id": "button_click_answered"
         },
-        {
+        "accessory": {
           "type": "button",
           "style": "danger",
           "text": {
