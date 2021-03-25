@@ -25,7 +25,8 @@ app.message('hello', async ({ message, say }) => {
           "text": `Hey there <@${message.user}>!`
         },
         "accessory": {
-          "type": "primary",
+          "type": "button",
+          "style": "primary",
           "text": {
             "type": "plain_text",
             "text": ":white_check_mark:"
@@ -33,7 +34,8 @@ app.message('hello', async ({ message, say }) => {
           "action_id": "button_click_answered"
         },
         {
-          "type": "danger",
+          "type": "button",
+          "style": "danger",
           "text": {
             "type": "plain_text",
             "text": ":question:"
