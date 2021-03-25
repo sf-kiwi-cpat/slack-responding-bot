@@ -25,12 +25,20 @@ app.message('hello', async ({ message, say }) => {
           "text": `Hey there <@${message.user}>!`
         },
         "accessory": {
-          "type": "button",
+          "type": "primary",
           "text": {
             "type": "plain_text",
-            "text": "Click Me"
+            "text": ":white_check_mark:"
           },
-          "action_id": "button_click"
+          "action_id": "button_click_answered"
+        },
+        {
+          "type": "danger",
+          "text": {
+            "type": "plain_text",
+            "text": ":question:"
+          },
+          "action_id": "button_click_question"
         }
       }
     ],
@@ -39,10 +47,16 @@ app.message('hello', async ({ message, say }) => {
   });
 });
 
-app.action('button_click', async ({ body, ack, say }) => {
+app.action('button_click_answered', async ({ body, ack, say }) => {
   // Acknowledge the action
   await ack();
-  await say(`<@${body.user.id}> clicked the button`);
+  await say(`<@${body.user.id}> clicked the :white_check_mark: button`);
+});
+
+app.action('button_click_question', async ({ body, ack, say }) => {
+  // Acknowledge the action
+  await ack();
+  await say(`<@${body.user.id}> clicked the :question: button`);
 });
 
 // Listens to incoming messages that contain "goodbye"
