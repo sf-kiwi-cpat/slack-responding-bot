@@ -9,6 +9,13 @@ const app = new App({
 // Listens to incoming messages that contain "hello"
 app.message('hello', async ({ message, say }) => {
   // say() sends a message to the channel where the event was triggered
+  var threadTs;
+  if(message.thread_ts) {
+      threadTs = message.thread_ts; 
+  }
+  else{
+    threadTs=message.ts;
+  }
   await say({
     blocks: [
       {
@@ -27,7 +34,8 @@ app.message('hello', async ({ message, say }) => {
         }
       }
     ],
-    text: `Hey there <@${message.user}>!`
+    text: `Hey there <@${message.user}>!`,
+    thread_ts: threadTs
   });
 });
 
@@ -39,8 +47,15 @@ app.action('button_click', async ({ body, ack, say }) => {
 
 // Listens to incoming messages that contain "goodbye"
 app.message('goodbye', async ({ message, say }) => {
+  var threadTs;
+  if(message.thread_ts) {
+      threadTs = message.thread_ts; 
+  }
+  else{
+    threadTs=message.ts;
+  }
   // say() sends a message to the channel where the event was triggered
-  await say(`See ya later, <@${message.user}> :wave:`);
+  await say({text:`See ya later, <@${message.user}> :wave:`,thread_ts: threadTs});
 });
 
 (async () => {
