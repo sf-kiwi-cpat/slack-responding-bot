@@ -76,10 +76,22 @@ app.action('button_click_question', async ({ body, ack, say }) => {
   await say({text:`No worries, an expert will check this out and help as soon as they can!`,thread_ts: threadTs});
   try {
     // Call reactions.add with the built-in client
-    const result = await web.reactions.add({
+    const reactionResult = await web.reactions.add({
       channel: body.channel.id,
       name: 'question',
       timestamp: threadTs
+    });
+  }
+  catch (error) {
+    console.error(error);
+  }
+	
+  try {
+    // Call reactions.add with the built-in client
+    const updateResult = await web.chat.update({
+        channel: body.channel.id,
+        ts: body.message.ts,
+	text: body.message.text
     });
   }
   catch (error) {
