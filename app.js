@@ -54,8 +54,8 @@ app.message('hello', async ({ message, say }) => {
   
   try {
     // Call reactions.add with the built-in client
-    const result = await say.reactions_add({
-      token: process.env.BOT_TOKEN,
+    const result = await say.reactions.add({
+//      token: process.env.BOT_TOKEN,
       channel: message.channel,
       name: 'thumbsup',
       timestamp: threadTs
