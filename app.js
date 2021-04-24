@@ -40,6 +40,7 @@ app.message('goodbye', async ({ message, say }) => {
 app.action('button_click_answered', async ({ body, ack, say }) => {
   // Acknowledge the action
   await ack();
+  console.debug(body);
   var threadTs;
   if(body.message && body.message.thread_ts) {
       threadTs = body.message.thread_ts; 
