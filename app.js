@@ -7,12 +7,17 @@ const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET
 });
 
+const DEFAULT_MESSAGE = "Thanks for posting - please check out the Resource Hub (https://sfdc.co/dehub) for a quick answer. Select the buttons below once you've checked the hub and this channel for your answer.";
+
 // Initialize
 const web = new WebClient(process.env.SLACK_BOT_TOKEN);
 
 // Listens to incoming messages that contain "hello"
 app.message('hello', async ({ message, say }) => {
   // say() sends a message to the channel where the event was triggered
+  let phrase = getResponseText('hello');
+  sendReply(message, say, phrase);
+  /*
   var threadTs;
   if(message.thread_ts) {
       threadTs = message.thread_ts; 
@@ -58,7 +63,7 @@ app.message('hello', async ({ message, say }) => {
     text: `Hey there <@${message.user}>!`,
     thread_ts: threadTs
   });
-  
+  */
 });
 
 app.action('button_click_answered', async ({ body, ack, say }) => {
@@ -134,14 +139,13 @@ app.message('goodbye', async ({ message, say }) => {
 function getResponseText(keyword)
 {
 	let response = "";
-	switch (keyword) 
-	{
-		case: "WhatsApp" 
+	switch (keyword) {
+		case "WhatsApp":
 			response = "WhatsApp response";
 			break;
 		default:
-			response = "";
-			
+			response = DEFAULT_MESSAGE;
+			break;
 	}
 	
 	return response;
