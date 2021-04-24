@@ -47,6 +47,19 @@ app.message('hello', async ({ message, say }) => {
     text: `Hey there <@${message.user}>!`,
     thread_ts: threadTs
   });
+  
+  try {
+    // Call reactions.add with the built-in client
+    const result = await client.reactions.add({
+      //token: '',
+      channel: message.channel,
+      name: 'thumbsup',
+      timestamp: threadTs
+    });
+  }
+  catch (error) {
+    console.error(error);
+  }
 });
 
 app.action('button_click_answered', async ({ body, ack, say }) => {
