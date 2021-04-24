@@ -22,32 +22,39 @@ app.message('hello', async ({ message, say }) => {
   }
   await say({
     blocks: [
-      {
-        "type": "section",
-        "text": {
-          "type": "mrkdwn",
-          "text": `Hey there <@${message.user}>!`
-        },
-        "accessory": {
-          "type": "button",
-          "style": "primary",
-          "text": {
-            "type": "plain_text",
-            "text": ":white_check_mark:"
-          },
-          "action_id": "button_click_answered"
-        },
-        "accessory": {
-          "type": "button",
-          "style": "danger",
-          "text": {
-            "type": "plain_text",
-            "text": ":question:"
-          },
-          "action_id": "button_click_question"
-        }
-      }
-    ],
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Hey there <@${message.user}>!"
+			}
+		},
+		{
+			"type": "actions",
+			"elements": [
+				{
+					"type": "button",
+					"style": "primary",
+					"text": {
+						"type": "plain_text",
+						"text": ":white_check_mark: Thanks, I found my answer",
+						"emoji": true
+					},
+					"action_id": "button_click_answered"
+				},
+				{
+					"type": "button",
+					"style": "danger",
+					"text": {
+						"type": "plain_text",
+						"text": ":question:I still need help",
+						"emoji": true
+					},
+					"action_id": "button_click_question"
+				}
+			]
+		}
+	],
     text: `Hey there <@${message.user}>!`,
     thread_ts: threadTs
   });
