@@ -89,6 +89,7 @@ app.action('button_click_answered', async ({ body, ack, say }) => {
 
 app.action('button_click_question', async ({ body, ack, say }) => {
   // Acknowledge the action
+	console.debug(body);
   await ack();
   var threadTs;
   if(body.thread_ts) {
