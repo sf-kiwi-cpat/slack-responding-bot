@@ -59,34 +59,57 @@ app.message('hello', async ({ message, say }) => {
     thread_ts: threadTs
   });
   
-  console.debug(app.token);
-  console.debug(message.channel);
-  console.debug(threadTs);
-  
+});
+
+app.action('button_click_answered', async ({ body, ack, say }) => {
+  // Acknowledge the action
+  await ack();
+  var threadTs;
+  if(body.thread_ts) {
+      threadTs = body.thread_ts; 
+  }
+  else{
+    threadTs=body.ts;
+  }
+  await say({text:`Glad I could help, happy selling!`,thread_ts: threadTs});
   try {
     // Call reactions.add with the built-in client
     const result = await web.reactions.add({
 //      token: process.env.BOT_TOKEN,
       channel: message.channel,
-      name: 'thumbsup',
+      name: 'white_check_mark',
       timestamp: threadTs
     });
   }
   catch (error) {
     console.error(error);
   }
-});
-
-app.action('button_click_answered', async ({ body, ack, say }) => {
-  // Acknowledge the action
-  await ack();
-  await say(`<@${body.user.id}> clicked the :white_check_mark: button`);
+  
 });
 
 app.action('button_click_question', async ({ body, ack, say }) => {
   // Acknowledge the action
   await ack();
-  await say(`<@${body.user.id}> clicked the :question: button`);
+  var threadTs;
+  if(body.thread_ts) {
+      threadTs = body.thread_ts; 
+  }
+  else{
+    threadTs=body.ts;
+  }
+  await say({text:`No worries, an expert will check this out and help as soon as they can!`,thread_ts: threadTs});
+  try {
+    // Call reactions.add with the built-in client
+    const result = await web.reactions.add({
+//      token: process.env.BOT_TOKEN,
+      channel: message.channel,
+      name: 'question',
+      timestamp: threadTs
+    });
+  }
+  catch (error) {
+    console.error(error);
+  }
 });
 
 // Listens to incoming messages that contain "goodbye"
