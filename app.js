@@ -152,7 +152,7 @@ function getResponseText(keyword)
 }
 
 
-function sendReply(message, say, phrase) {
+async function sendReply(message, say, phrase) {
   // https://cloud.google.com/functions/docs/env-var#nodejs_10_and_subsequent_runtimes
   var threadTs;
   if(message.thread_ts) {
