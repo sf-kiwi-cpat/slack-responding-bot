@@ -76,7 +76,7 @@ app.action('button_click_answered', async ({ body, ack, say }) => {
     // Call reactions.add with the built-in client
     const result = await web.reactions.add({
 //      token: process.env.BOT_TOKEN,
-      channel: message.channel,
+      channel: body.channel,
       name: 'white_check_mark',
       timestamp: threadTs
     });
@@ -103,7 +103,7 @@ app.action('button_click_question', async ({ body, ack, say }) => {
     // Call reactions.add with the built-in client
     const result = await web.reactions.add({
 //      token: process.env.BOT_TOKEN,
-      channel: message.channel,
+      channel: body.channel,
       name: 'question',
       timestamp: threadTs
     });
