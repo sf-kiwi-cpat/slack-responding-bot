@@ -48,7 +48,7 @@ app.message('hello', async ({ message, say }) => {
     thread_ts: threadTs
   });
   
-  console.debug(process.env.BOT_TOKEN);
+  console.debug(app.token);
   console.debug(message.channel);
   console.debug(threadTs);
   
