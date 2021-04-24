@@ -7,17 +7,25 @@ const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET
 });
 
-const DEFAULT_MESSAGE = "Thanks for posting - please check out the Resource Hub (https://sfdc.co/dehub) for a quick answer. Select the buttons below once you've checked the hub and this channel for your answer.";
+const DEFAULT_MESSAGE = "Thanks for posting <@${message.user}>! - please check out the Resource Hub (https://sfdc.co/dehub) for a quick answer. Select the buttons below once you've checked the hub and this channel for your answer.";
 
 // Initialize
 const web = new WebClient(process.env.SLACK_BOT_TOKEN);
 
 // Listens to incoming messages that contain "hello"
 app.message('hello', async ({ message, say }) => {
-  // say() sends a message to the channel where the event was triggered
   let phrase = getResponseText('hello');
   sendReply(message, say, phrase);
-  /*
+});
+
+// Listens to incoming messages that contain "goodbye"
+app.message('WhatsApp', async ({ message, say }) => {
+    let phrase = getResponseText('WhatsApp');
+    sendReply(message, say, phrase);
+});
+
+// Listens to incoming messages that contain "goodbye"
+app.message('goodbye', async ({ message, say }) => {
   var threadTs;
   if(message.thread_ts) {
       threadTs = message.thread_ts; 
@@ -25,45 +33,8 @@ app.message('hello', async ({ message, say }) => {
   else{
     threadTs=message.ts;
   }
-  await say({
-    blocks: [
-	{
-		"type": "section",
-		"text": {
-		  "type": "mrkdwn",
-		  "text": `Hey there <@${message.user}>!`
-		}
-	},
-	{
-		"type": "actions",
-		"elements": [
-			{
-				"type": "button",
-				"style": "primary",
-				"text": {
-					"type": "plain_text",
-					"text": ":white_check_mark: Thanks, I found my answer",
-					"emoji": true
-				},
-				"action_id": "button_click_answered"
-			},
-			{
-				"type": "button",
-				"style": "danger",
-				"text": {
-					"type": "plain_text",
-					"text": ":question:I still need help",
-					"emoji": true
-				},
-				"action_id": "button_click_question"
-			}
-		]
-	}
-  ],
-    text: `Hey there <@${message.user}>!`,
-    thread_ts: threadTs
-  });
-  */
+  // say() sends a message to the channel where the event was triggered
+  await say({text:`See ya later, <@${message.user}> :wave:`,thread_ts: threadTs});
 });
 
 app.action('button_click_answered', async ({ body, ack, say }) => {
@@ -115,18 +86,7 @@ app.action('button_click_question', async ({ body, ack, say }) => {
   }
 });
 
-// Listens to incoming messages that contain "goodbye"
-app.message('goodbye', async ({ message, say }) => {
-  var threadTs;
-  if(message.thread_ts) {
-      threadTs = message.thread_ts; 
-  }
-  else{
-    threadTs=message.ts;
-  }
-  // say() sends a message to the channel where the event was triggered
-  await say({text:`See ya later, <@${message.user}> :wave:`,thread_ts: threadTs});
-});
+
 
 (async () => {
   // Start your app
