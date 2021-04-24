@@ -1,10 +1,14 @@
 const { App } = require('@slack/bolt');
+const { WebClient } = require('@slack/web-api');
 
 // Initializes your app with your bot token and signing secret
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET
 });
+
+// Initialize
+const web = new WebClient(process.env.SLACK_BOT_TOKEN);
 
 // Listens to incoming messages that contain "hello"
 app.message('hello', async ({ message, say }) => {
@@ -54,7 +58,7 @@ app.message('hello', async ({ message, say }) => {
   
   try {
     // Call reactions.add with the built-in client
-    const result = await say.reactions.add({
+    const result = await web.reactions.add({
 //      token: process.env.BOT_TOKEN,
       channel: message.channel,
       name: 'thumbsup',
