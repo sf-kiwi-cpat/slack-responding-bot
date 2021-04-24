@@ -22,39 +22,39 @@ app.message('hello', async ({ message, say }) => {
   }
   await say({
     blocks: [
-		{
-			"type": "section",
-			"text": {
-			  "type": "mrkdwn",
-			  "text": `Hey there <@${message.user}>!`
-			}
-		},
-		{
-			"type": "actions",
-			"elements": [
-				{
-					"type": "button",
-					"style": "primary",
-					"text": {
-						"type": "plain_text",
-						"text": ":white_check_mark: Thanks, I found my answer",
-						"emoji": true
-					},
-					"action_id": "button_click_answered"
-				},
-				{
-					"type": "button",
-					"style": "danger",
-					"text": {
-						"type": "plain_text",
-						"text": ":question:I still need help",
-						"emoji": true
-					},
-					"action_id": "button_click_question"
-				}
-			]
+	{
+		"type": "section",
+		"text": {
+		  "type": "mrkdwn",
+		  "text": `Hey there <@${message.user}>!`
 		}
-	],
+	},
+	{
+		"type": "actions",
+		"elements": [
+			{
+				"type": "button",
+				"style": "primary",
+				"text": {
+					"type": "plain_text",
+					"text": ":white_check_mark: Thanks, I found my answer",
+					"emoji": true
+				},
+				"action_id": "button_click_answered"
+			},
+			{
+				"type": "button",
+				"style": "danger",
+				"text": {
+					"type": "plain_text",
+					"text": ":question:I still need help",
+					"emoji": true
+				},
+				"action_id": "button_click_question"
+			}
+		]
+	}
+  ],
     text: `Hey there <@${message.user}>!`,
     thread_ts: threadTs
   });
@@ -75,7 +75,6 @@ app.action('button_click_answered', async ({ body, ack, say }) => {
   try {
     // Call reactions.add with the built-in client
     const result = await web.reactions.add({
-//      token: process.env.BOT_TOKEN,
       channel: body.channel.id,
       name: 'white_check_mark',
       timestamp: threadTs
@@ -89,7 +88,6 @@ app.action('button_click_answered', async ({ body, ack, say }) => {
 
 app.action('button_click_question', async ({ body, ack, say }) => {
   // Acknowledge the action
-	console.debug(body);
   await ack();
   var threadTs;
   if(body.message && body.message.thread_ts) {
@@ -102,7 +100,6 @@ app.action('button_click_question', async ({ body, ack, say }) => {
   try {
     // Call reactions.add with the built-in client
     const result = await web.reactions.add({
-//      token: process.env.BOT_TOKEN,
       channel: body.channel.id,
       name: 'question',
       timestamp: threadTs
