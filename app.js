@@ -129,3 +129,70 @@ app.message('goodbye', async ({ message, say }) => {
 
   console.log('⚡️ Bolt app is running!');
 })();
+
+
+function getResponseText(keyword)
+{
+	let response = "";
+	switch (keyword) 
+	{
+		case: "WhatsApp" 
+			response = "WhatsApp response";
+			break;
+		default:
+			response = "";
+			
+	}
+	
+	return response;
+}
+
+
+function sendReply(message, say, phrase) {
+  // https://cloud.google.com/functions/docs/env-var#nodejs_10_and_subsequent_runtimes
+  var threadTs;
+  if(message.thread_ts) {
+      threadTs = message.thread_ts; 
+  }
+  else{
+    threadTs=message.ts;
+  }
+  await say({
+    blocks: [
+	{
+		"type": "section",
+		"text": {
+		  "type": "mrkdwn",
+		  "text": phrase
+		}
+	},
+	{
+		"type": "actions",
+		"elements": [
+			{
+				"type": "button",
+				"style": "primary",
+				"text": {
+					"type": "plain_text",
+					"text": ":white_check_mark: Thanks, I found my answer",
+					"emoji": true
+				},
+				"action_id": "button_click_answered"
+			},
+			{
+				"type": "button",
+				"style": "danger",
+				"text": {
+					"type": "plain_text",
+					"text": ":question:I still need help",
+					"emoji": true
+				},
+				"action_id": "button_click_question"
+			}
+		]
+	}
+  ],
+    text: phrase,
+    thread_ts: threadTs
+  });
+}
