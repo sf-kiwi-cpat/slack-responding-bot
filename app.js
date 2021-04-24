@@ -25,8 +25,8 @@ app.message('hello', async ({ message, say }) => {
 		{
 			"type": "section",
 			"text": {
-				"type": "mrkdwn",
-				"text": "Hey there <@${message.user}>!"
+			  "type": "mrkdwn",
+			  "text": `Hey there <@${message.user}>!`
 			}
 		},
 		{
@@ -65,18 +65,18 @@ app.action('button_click_answered', async ({ body, ack, say }) => {
   // Acknowledge the action
   await ack();
   var threadTs;
-  if(body.thread_ts) {
-      threadTs = body.thread_ts; 
+  if(body.message && body.message.thread_ts) {
+      threadTs = body.message.thread_ts; 
   }
-  else{
-    threadTs=body.ts;
+  else if (body.message) {
+    threadTs=body.message.ts;
   }
   await say({text:`Glad I could help, happy selling!`,thread_ts: threadTs});
   try {
     // Call reactions.add with the built-in client
     const result = await web.reactions.add({
 //      token: process.env.BOT_TOKEN,
-      channel: body.channel,
+      channel: body.channel.id,
       name: 'white_check_mark',
       timestamp: threadTs
     });
