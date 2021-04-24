@@ -48,6 +48,10 @@ app.message('hello', async ({ message, say }) => {
     thread_ts: threadTs
   });
   
+  console.debug(process.env.BOT_TOKEN);
+  console.debug(message.channel);
+  console.debug(threadTs);
+  
   try {
     // Call reactions.add with the built-in client
     const result = await say.reactions.add({
