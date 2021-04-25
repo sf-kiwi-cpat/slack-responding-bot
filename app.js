@@ -26,7 +26,7 @@ const web = new WebClient(process.env.SLACK_BOT_TOKEN);
 app.message(async ({message, say}) => {
     console.debug(message);
     // We don't care about messages sent within a thread, only reply to top level messages. So if the message has a thread_ts then ignore it
-    if (!message.thread_ts) {
+    if (!message.thread_ts && !message.hidden) {
 	    let channelName = await getChannelName(message.channel);
 	    console.debug("channel:" + channelName);
 	    let regexList = getRegexForChannel(channelName);
