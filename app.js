@@ -34,7 +34,7 @@ app.message(async ({message, say}) => {
 
 function getRegexForChannel(channelName)
 {
-	if (CHANNEL_REGEX_MAP.has(channelName) {
+	if (CHANNEL_REGEX_MAP.has(channelName)) {
 		return CHANNEL_REGEX_MAP.get(channelName);
 	}
 	return null;
