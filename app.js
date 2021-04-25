@@ -60,7 +60,7 @@ app.action('button_click_question', async ({body, ack, say }) => {
 });
 
 
-await function getChannelName(channelId)
+async function getChannelName(channelId)
 {
 	let channelName = null;
 	try {
