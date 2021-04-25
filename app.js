@@ -20,7 +20,9 @@ const web = new WebClient(process.env.SLACK_BOT_TOKEN);
 app.message('hello', async ({message, say}) => {
     console.debug(say);
     console.debug(message);
-    let phrase = getResponseText('hello', message);
+    let channelName = getChannelName(message.channel);
+    console.debug("channel:" + channelName);
+    let phrase = getResponseText('hello', message, channelName);
     sendReply(message, say, phrase);
 });
 
@@ -58,9 +60,28 @@ app.action('button_click_question', async ({body, ack, say }) => {
 });
 
 
+await function getChannelName(channelId)
+{
+	let channelName = null;
+	try {
+	    // Call reactions.add with the built-in client
+	    const channelResult = await web.conversations.info({
+		channel: channelId
+	    });
+	    console.debug(channelResult);
+	    if (channelResult && channelResult.ok && channelResult.channel)
+	    {
+    		channelName = channelResult.channel.name
+	    }
+	} catch (error) {
+	    console.error(error);
+	}
+	return channelName;
+}
+
 
 // Decides what text is sent as a reply to the original message based on the keyword/regex that was matched
-function getResponseText(keyword, message) {
+function getResponseText(keyword, message, channel) {
     let response = "";
     switch (keyword) {
         case "WhatsApp":
@@ -134,6 +155,7 @@ async function handleButtonClick(body, say, message, reaction) {
 	    text: message,
 	    thread_ts: threadTs
 	});
+	
 	try {
 	    // Call reactions.add with the built-in client
 	    const reactionResult = await web.reactions.add({
