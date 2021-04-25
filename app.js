@@ -18,16 +18,18 @@ const web = new WebClient(process.env.SLACK_BOT_TOKEN);
 
 // Listens to incoming messages that contain "hello"
 app.message('hello', async ({message, say}) => {
-    console.debug(say);
-    console.debug(message);
+//    console.debug(message);
     let channelName = await getChannelName(message.channel);
-    console.debug("channel:" + channelName);
+//    console.debug("channel:" + channelName);
     let phrase = getResponseText('hello', message, channelName);
     sendReply(message, say, phrase);
 });
 
 // Listens to incoming messages that contain "WhatsApp"
 app.message('WhatsApp', async ({message, say}) => {
+//    console.debug(message);
+    let channelName = await getChannelName(message.channel);
+//    console.debug("channel:" + channelName);
     let phrase = getResponseText('WhatsApp', message);
     sendReply(message, say, phrase);
 });
@@ -80,7 +82,7 @@ async function getChannelName(channelId)
 
 
 // Decides what text is sent as a reply to the original message based on the keyword/regex that was matched
-function getResponseText(keyword, message, channel) {
+function getResponseText(keyword, message, channelName) {
     let response = "";
     switch (keyword) {
         case "WhatsApp":
@@ -96,13 +98,14 @@ function getResponseText(keyword, message, channel) {
 
 // Function that actually sends the reply, ensures it is threaded and includes buttons to respond/interact with.
 async function sendReply(message, say, phrase) {
-    // https://cloud.google.com/functions/docs/env-var#nodejs_10_and_subsequent_runtimes
+    // Get the thread timestamp so we can reply in thread
     var threadTs;
     if (message.thread_ts) {
         threadTs = message.thread_ts;
     } else {
         threadTs = message.ts;
     }
+    // Send the repsonse
     await say({
         blocks: [{
                 "type": "section",
