@@ -11,7 +11,11 @@ const app = new App({
     signingSecret: process.env.SLACK_SIGNING_SECRET
 });
 
-const DEFAULT_MESSAGE = "Thanks for posting <@${message.user}>! - please check out the Resource Hub (https://sfdc.co/dehub) for a quick answer. Select the buttons below once you've checked the hub and this channel for your answer.";
+function getDefaultMessage(message)
+{
+	// Can't use a static variable/constant as it needs to evaluate the user at runtime.
+	return "Thanks for posting <@${message.user}>! - please check out the Resource Hub (https://sfdc.co/dehub) for a quick answer. Select the buttons below once you've checked the hub and this channel for your answer.";
+}
 
 // Initialize
 const web = new WebClient(process.env.SLACK_BOT_TOKEN);
@@ -21,7 +25,7 @@ app.message('hello', async ({
     message,
     say
 }) => {
-    let phrase = getResponseText('hello');
+    let phrase = getResponseText('hello', message);
     sendReply(message, say, phrase);
 });
 
@@ -30,7 +34,7 @@ app.message('WhatsApp', async ({
     message,
     say
 }) => {
-    let phrase = getResponseText('WhatsApp');
+    let phrase = getResponseText('WhatsApp', message);
     sendReply(message, say, phrase);
 });
 
@@ -80,22 +84,22 @@ app.action('button_click_question', async ({
     console.log('⚡️ Bolt app is running!');
 })();
 
-
-function getResponseText(keyword) {
+// Decides what text is sent as a reply to the original message based on the keyword/regex that was matched
+function getResponseText(keyword, message) {
     let response = "";
     switch (keyword) {
         case "WhatsApp":
             response = "WhatsApp response";
             break;
         default:
-            response = DEFAULT_MESSAGE;
+            response = getDefaultMessage(message);
             break;
     }
 
     return response;
 }
 
-
+// Function that actually sends the reply, ensures it is threaded and includes buttons to respond/interact with.
 async function sendReply(message, say, phrase) {
     // https://cloud.google.com/functions/docs/env-var#nodejs_10_and_subsequent_runtimes
     var threadTs;
@@ -142,6 +146,7 @@ async function sendReply(message, say, phrase) {
     });
 }
 
+// Handles the button clicks to send a reply in the thread, react to the original post and remove the buttons from the first reply
 async function handleButtonClick(body, say, message, reaction) {
 	console.debug(body);
 	var threadTs;
@@ -169,7 +174,7 @@ async function handleButtonClick(body, say, message, reaction) {
 	    // Remove the buttons from the previous message
 	    const updateResult = await web.chat.update({
 		channel: body.channel.id,
-		ts: body.message.ts,,
+		ts: body.message.ts,
 		text: body.message.text,
 		blocks: []
 	    });
