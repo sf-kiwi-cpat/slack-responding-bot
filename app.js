@@ -7,6 +7,12 @@ const app = new App({
     signingSecret: process.env.SLACK_SIGNING_SECRET
 });
 
+const CHANNEL_REGEX_MAP = new Map();
+
+function buildMap() {
+    CHANNEL_REGEX_MAP.set('automated-responses', ["WhatsApp", "WeChat", "roadmap"]);
+}
+
 function getDefaultMessage(message)
 {
     // Can't use a static variable/constant as it needs to evaluate the user at runtime.
@@ -18,30 +24,22 @@ const web = new WebClient(process.env.SLACK_BOT_TOKEN);
 
 // Listens to all incoming messages
 app.message(async ({message, say}) => {
-//    console.debug(message);
+    console.debug(message);
     let channelName = await getChannelName(message.channel);
-//    console.debug("channel:" + channelName);
+    console.debug("channel:" + channelName);
+    let regexList = getRegexForChannel(channelName);
     let phrase = getResponseText('hello', message, channelName);
     sendReply(message, say, phrase);
 });
 
-// Listens to incoming messages that contain "hello"
-app.message('hello', async ({message, say}) => {
-//    console.debug(message);
-    let channelName = await getChannelName(message.channel);
-//    console.debug("channel:" + channelName);
-    let phrase = getResponseText('hello', message, channelName);
-    sendReply(message, say, phrase);
-});
+function getRegexForChannel(channelName)
+{
+	if (CHANNEL_REGEX_MAP.has(channelName) {
+		return CHANNEL_REGEX_MAP.get(channelName);
+	}
+	return null;
+}
 
-// Listens to incoming messages that contain "WhatsApp"
-app.message('WhatsApp', async ({message, say}) => {
-//    console.debug(message);
-    let channelName = await getChannelName(message.channel);
-//    console.debug("channel:" + channelName);
-    let phrase = getResponseText('WhatsApp', message);
-    sendReply(message, say, phrase);
-});
 
 // Listens to incoming messages that contain "goodbye"
 app.message('goodbye', async ({message, say}) => {
