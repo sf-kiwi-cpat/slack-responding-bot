@@ -59,7 +59,7 @@ app.action('button_click_answered', async ({
 }) => {
     // Acknowledge the action
     await ack();
-    handleButtonClick(body, "Glad I could help, happy selling!", "white_check_mark");
+    handleButtonClick(body, say, "Glad I could help, happy selling!", "white_check_mark");
 });
 
 app.action('button_click_question', async ({
@@ -69,7 +69,7 @@ app.action('button_click_question', async ({
 }) => {
     // Acknowledge the action
     await ack();
-    handleButtonClick(body, "No worries, an expert will check this out and help as soon as they can.", "question");
+    handleButtonClick(body, say, "No worries, an expert will check this out and help as soon as they can.", "question");
 });
 
 
@@ -142,7 +142,7 @@ async function sendReply(message, say, phrase) {
     });
 }
 
-async function handleButtonClick(body, message, reaction) {
+async function handleButtonClick(body, say, message, reaction) {
 	console.debug(body);
 	var threadTs;
 	if (body.message && body.message.thread_ts) {
