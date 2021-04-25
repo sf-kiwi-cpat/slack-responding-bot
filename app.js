@@ -1,9 +1,5 @@
-const {
-    App
-} = require('@slack/bolt');
-const {
-    WebClient
-} = require('@slack/web-api');
+const {App} = require('@slack/bolt');
+const {WebClient} = require('@slack/web-api');
 
 // Initializes your app with your bot token and signing secret
 const app = new App({
@@ -13,36 +9,27 @@ const app = new App({
 
 function getDefaultMessage(message)
 {
-	// Can't use a static variable/constant as it needs to evaluate the user at runtime.
-	return "Thanks for posting <@${message.user}>! - please check out the Resource Hub (https://sfdc.co/dehub) for a quick answer. Select the buttons below once you've checked the hub and this channel for your answer.";
+    // Can't use a static variable/constant as it needs to evaluate the user at runtime.
+    return "Thanks for posting <@" + message.user" + >! - please check out the Resource Hub (https://sfdc.co/dehub) for a quick answer. Select the buttons below once you've checked the hub and this channel for your answer.";
 }
 
 // Initialize
 const web = new WebClient(process.env.SLACK_BOT_TOKEN);
 
 // Listens to incoming messages that contain "hello"
-app.message('hello', async ({
-    message,
-    say
-}) => {
+app.message('hello', async ({message, say}) => {
     let phrase = getResponseText('hello', message);
     sendReply(message, say, phrase);
 });
 
-// Listens to incoming messages that contain "goodbye"
-app.message('WhatsApp', async ({
-    message,
-    say
-}) => {
+// Listens to incoming messages that contain "WhatsApp"
+app.message('WhatsApp', async ({message, say}) => {
     let phrase = getResponseText('WhatsApp', message);
     sendReply(message, say, phrase);
 });
 
 // Listens to incoming messages that contain "goodbye"
-app.message('goodbye', async ({
-    message,
-    say
-}) => {
+app.message('goodbye', async ({message, say}) => {
     var threadTs;
     if (message.thread_ts) {
         threadTs = message.thread_ts;
@@ -56,33 +43,19 @@ app.message('goodbye', async ({
     });
 });
 
-app.action('button_click_answered', async ({
-    body,
-    ack,
-    say
-}) => {
+app.action('button_click_answered', async ({body, ack, say}) => {
     // Acknowledge the action
     await ack();
     handleButtonClick(body, say, "Glad I could help, happy selling!", "white_check_mark");
 });
 
-app.action('button_click_question', async ({
-    body,
-    ack,
-    say
-}) => {
+app.action('button_click_question', async ({body, ack, say }) => {
     // Acknowledge the action
     await ack();
     handleButtonClick(body, say, "No worries, an expert will check this out and help as soon as they can.", "question");
 });
 
 
-
-(async () => {
-    // Start your app
-    await app.start(process.env.PORT || 3000);
-    console.log('⚡️ Bolt app is running!');
-})();
 
 // Decides what text is sent as a reply to the original message based on the keyword/regex that was matched
 function getResponseText(keyword, message) {
@@ -182,3 +155,11 @@ async function handleButtonClick(body, say, message, reaction) {
 	    console.error(error);
 	}
 }
+
+
+
+(async () => {
+    // Start your app
+    await app.start(process.env.PORT || 3000);
+    console.log('⚡️ Bolt app is running!');
+})();
