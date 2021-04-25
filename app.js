@@ -18,6 +18,7 @@ const web = new WebClient(process.env.SLACK_BOT_TOKEN);
 
 // Listens to incoming messages that contain "hello"
 app.message('hello', async ({message, say}) => {
+    console.debug(message);
     let phrase = getResponseText('hello', message);
     sendReply(message, say, phrase);
 });
