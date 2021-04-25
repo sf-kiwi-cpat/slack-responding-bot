@@ -34,7 +34,7 @@ app.message(async ({message, say}) => {
 	    let messageText = new String(message.text);
 	    for (regex in regexList) {
 		console.debug("check regex:" + regexList[regex] + " \nWith: " + messageText);
-	    	if (("/" + messageText + "/").match(regex)) {
+	    	if (messageText.match(regexList[regex])) {
 			console.debug("matched regex:" + regexList[regex]);
 			response = getResponseText(regexList[regex], channelName);
 			break; 
