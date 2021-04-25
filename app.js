@@ -10,7 +10,7 @@ const app = new App({
 function getDefaultMessage(message)
 {
     // Can't use a static variable/constant as it needs to evaluate the user at runtime.
-    return `Thanks for posting <@${message.user}> - please check out the Resource Hub (https://sfdc.co/dehub) for a quick answer. Select the buttons below once you've checked the hub and this channel for your answer.`;
+    return `Thanks for posting <@${message.user}> - please check out the Resource Hub (https://sfdc.co/dehub) for a quick answer. \nSelect the buttons below once you've searched the hub and this channel for your answer.`;
 }
 
 // Initialize
@@ -106,7 +106,7 @@ async function sendReply(message, say, phrase) {
                         "style": "danger",
                         "text": {
                             "type": "plain_text",
-                            "text": ":question:I still need help",
+                            "text": ":question:I searched but still need help",
                             "emoji": true
                         },
                         "action_id": "button_click_question"
