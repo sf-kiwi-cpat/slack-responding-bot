@@ -10,7 +10,7 @@ const app = new App({
 function getDefaultMessage(message)
 {
     // Can't use a static variable/constant as it needs to evaluate the user at runtime.
-    return `Thanks for posting <@${message.user}> - please check out the Resource Hub (https://sfdc.co/dehub) for a quick answer. \nSelect the buttons below once you've searched the hub and this channel for your answer.`;
+    return `Thanks for posting <@${message.user}> - please check out the Resource Hub (https://sfdc.co/dehub) for a quick answer. \n\nSelect the buttons below once you've searched the hub and this channel for your answer.`;
 }
 
 // Initialize
@@ -18,6 +18,7 @@ const web = new WebClient(process.env.SLACK_BOT_TOKEN);
 
 // Listens to incoming messages that contain "hello"
 app.message('hello', async ({message, say}) => {
+    console.debug(say);
     console.debug(message);
     let phrase = getResponseText('hello', message);
     sendReply(message, say, phrase);
