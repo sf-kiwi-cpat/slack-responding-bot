@@ -169,7 +169,8 @@ async function handleButtonClick(body, say, message, reaction) {
 	    // Remove the buttons from the previous message
 	    const updateResult = await web.chat.update({
 		channel: body.channel.id,
-		ts: body.message.ts,
+		ts: body.message.ts,,
+		text: body.message.text,
 		blocks: []
 	    });
 	} catch (error) {
