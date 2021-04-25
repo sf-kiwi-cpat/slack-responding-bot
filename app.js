@@ -204,5 +204,6 @@ async function handleButtonClick(body, say, message, reaction) {
 (async () => {
     // Start your app
     await app.start(process.env.PORT || 3000);
+    buildMap();
     console.log('⚡️ Bolt app is running!');
 })();
