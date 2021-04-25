@@ -32,9 +32,11 @@ app.message(async ({message, say}) => {
 	    let regexList = getRegexForChannel(channelName);
 	    let response = getDefaultMessage(message);
 	    for (regex in regexList) {
+		console.debug("check regex:" + regex + " \nWith: " + message.text);
 	    	if (message.text.match(regex)) {
+			console.debug("matched regex:" + regex);
 			response = getResponseText(regex, channelName);
-			break;
+			break; 
 		}
 	    }
 	    sendReply(message, say, response);    
