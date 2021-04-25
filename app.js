@@ -17,7 +17,7 @@ function getDefaultMessage(message)
 const web = new WebClient(process.env.SLACK_BOT_TOKEN);
 
 // Listens to all incoming messages
-app.message(null, async ({message, say}) => {
+app.message(async ({message, say}) => {
 //    console.debug(message);
     let channelName = await getChannelName(message.channel);
 //    console.debug("channel:" + channelName);
