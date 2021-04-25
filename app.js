@@ -25,11 +25,20 @@ const web = new WebClient(process.env.SLACK_BOT_TOKEN);
 // Listens to all incoming messages
 app.message(async ({message, say}) => {
     console.debug(message);
-    let channelName = await getChannelName(message.channel);
-    console.debug("channel:" + channelName);
-    let regexList = getRegexForChannel(channelName);
-    let phrase = getResponseText('hello', message, channelName);
-    sendReply(message, say, phrase);
+    // We don't care about messages sent within a thread, only reply to top level messages. So if the message has a thread_ts then ignore it
+    if (!message.thread_ts) {
+	    let channelName = await getChannelName(message.channel);
+	    console.debug("channel:" + channelName);
+	    let regexList = getRegexForChannel(channelName);
+	    let response = getDefaultMessage(message);
+	    for (regex in regexList) {
+	    	if (message.text.match(regex)) {
+			response = getResponseText(regex, channelName);
+			break;
+		}
+	    }
+	    sendReply(message, say, response);    
+    }
 });
 
 function getRegexForChannel(channelName)
@@ -89,15 +98,14 @@ async function getChannelName(channelId)
 
 
 // Decides what text is sent as a reply to the original message based on the keyword/regex that was matched
-function getResponseText(keyword, message, channelName) {
-    let response = "";
+function getResponseText(keyword, channelName) {
+    let response = null;
     switch (keyword) {
         case "WhatsApp":
             response = "WhatsApp response";
             break;
-        default:
-            response = getDefaultMessage(message);
-            break;
+        case "WeChat":
+	    response = "WeChat response"	    
     }
 
     return response;
