@@ -131,7 +131,7 @@ async function sendReply(message, say, phrase) {
                         "style": "danger",
                         "text": {
                             "type": "plain_text",
-                            "text": ":question:I searched but still need help",
+                            "text": "I searched but still need help",
                             "emoji": true
                         },
                         "action_id": "button_click_question"
