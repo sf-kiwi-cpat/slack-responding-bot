@@ -16,6 +16,15 @@ function getDefaultMessage(message)
 // Initialize
 const web = new WebClient(process.env.SLACK_BOT_TOKEN);
 
+// Listens to all incoming messages
+app.message(null, async ({message, say}) => {
+//    console.debug(message);
+    let channelName = await getChannelName(message.channel);
+//    console.debug("channel:" + channelName);
+    let phrase = getResponseText('hello', message, channelName);
+    sendReply(message, say, phrase);
+});
+
 // Listens to incoming messages that contain "hello"
 app.message('hello', async ({message, say}) => {
 //    console.debug(message);
