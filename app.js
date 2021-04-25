@@ -20,7 +20,7 @@ const web = new WebClient(process.env.SLACK_BOT_TOKEN);
 app.message('hello', async ({message, say}) => {
     console.debug(say);
     console.debug(message);
-    let channelName = getChannelName(message.channel);
+    let channelName = await getChannelName(message.channel);
     console.debug("channel:" + channelName);
     let phrase = getResponseText('hello', message, channelName);
     sendReply(message, say, phrase);
