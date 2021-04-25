@@ -68,7 +68,7 @@ async function getChannelName(channelId)
 	    const channelResult = await web.conversations.info({
 		channel: channelId
 	    });
-	    console.debug(channelResult);
+	    console.debug("channelResult" + channelResult);
 	    if (channelResult && channelResult.ok && channelResult.channel)
 	    {
     		channelName = channelResult.channel.name
