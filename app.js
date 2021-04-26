@@ -8,18 +8,34 @@ const app = new App({
 });
 
 const CHANNEL_REGEX_MAP = new Map();
+const BOT_RESPONSE_HELPED = "Glad I could help, happy selling!";
+const BOT_RESPONSE_HELPED_EMOTICON = "white_check_mark";
+const BOT_RESPONSE_DIDNT_HELP = "No worries, an expert will check this out and help as soon as they can.";
+const BOT_RESPONSE_DIDNT_HELP_EMOTICON = "question";
 
+
+// This is called on the startup of the app - builds out the regular expressions to check per Slack channel
 function buildMap() {
     CHANNEL_REGEX_MAP.set('automated-responses', ["WhatsApp", "WeChat", "roadmap"]);
 }
 
-function getDefaultMessage(message)
+// Get the default message as the fallback for a channel.
+function getDefaultMessage(message, channel)
 {
-    // Can't use a static variable/constant as it needs to evaluate the user at runtime.
-    return `Thanks for posting <@${message.user}> - please check out the <https://sfdc.co/dehub|Resource Hub> for a quick answer. \n\nSelect the buttons below once you've searched the hub and this channel for your answer.`;
+	let defaultMessage = null;
+	// Can't use a static variable/constant as it needs to evaluate the user at runtime.
+	switch (channel) {
+		case "automated-responses":
+    			defaultMessage =  `Thanks for posting <@${message.user}> - please check out the <https://sfdc.co/dehub|Resource Hub> for a quick answer. \n\nSelect the buttons below once you've searched the hub and this channel for your answer.`;
+			break;
+		case "selling-digital-engagement-and-einstein-bots":
+			defaultMessage =  `Thanks for posting <@${message.user}> - please check out the <https://sfdc.co/dehub|Resource Hub> for a quick answer. \n\nSelect the buttons below once you've searched the hub and this channel for your answer.`;
+			break;
+	}
+	return message;		
 }
 
-// Initialize
+// Initialize the web client so we can call the API later
 const web = new WebClient(process.env.SLACK_BOT_TOKEN);
 
 // Listens to all incoming messages
@@ -32,7 +48,7 @@ app.message(async ({message, say}) => {
 	    // Get the list of things to check for for this channel
 	    let regexList = getRegexForChannel(channelName);
 	    // Get the default response in case we don't match any of the things to check for above
-	    let response = getDefaultMessage(message);
+	    let response = getDefaultMessage(message,channelName);
 	    // Now check each regular expression and see if it is in the message sent in
 	    for (regex in regexList) {
 		console.debug("check regex:" + regexList[regex] + " \nWith: " + message.text);
@@ -46,8 +62,10 @@ app.message(async ({message, say}) => {
     }
 });
 
+// Finds all the regular expressions we want to check the message for this channel
 function getRegexForChannel(channelName)
 {
+	// If the map has an entry for this channel then return the associated list.
 	if (CHANNEL_REGEX_MAP.has(channelName)) {
 		return CHANNEL_REGEX_MAP.get(channelName);
 	}
@@ -71,16 +89,18 @@ app.message('goodbye', async ({message, say}) => {
     });
 });
 
+// Called after the 'this helped me' button is clicked
 app.action('button_click_answered', async ({body, ack, say}) => {
     // Acknowledge the action
     await ack();
-    handleButtonClick(body, say, "Glad I could help, happy selling!", "white_check_mark");
+    handleButtonClick(body, say, BOT_RESPONSE_HELPED, BOT_RESPONSE_HELPED_EMOTICON);
 });
 
+// Called after the 'I still need help' button is clicked.
 app.action('button_click_question', async ({body, ack, say }) => {
     // Acknowledge the action
     await ack();
-    handleButtonClick(body, say, "No worries, an expert will check this out and help as soon as they can.", "question");
+    handleButtonClick(body, say, BOT_RESPONSE_DIDNT_HELP, BOT_RESPONSE_DIDNT_HELP_EMOTICON);
 });
 
 // Function the calls the web API to get the name of a channel from the ID of it.
