@@ -35,7 +35,7 @@ app.message(async ({message, say}) => {
 		console.debug("check regex:" + regexList[regex] + " \nWith: " + message.text);
 	    	if (message.text.match(regexList[regex])) {
 			console.debug("matched regex:" + regexList[regex]);
-			response = getResponseText(regexList[regex], channelName);
+			response = getResponseText(regexList[regex], message, channelName);
 			break; 
 		}
 	    }
@@ -100,7 +100,7 @@ async function getChannelName(channelId)
 
 
 // Decides what text is sent as a reply to the original message based on the keyword/regex that was matched
-function getResponseText(keyword, channelName) {
+function getResponseText(keyword, message, channelName) {
     let response = null;
     switch (keyword) {
         case "WhatsApp":
