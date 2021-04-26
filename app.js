@@ -29,8 +29,11 @@ app.message(async ({message, say}) => {
     if (!message.thread_ts && !message.hidden) {
 	    let channelName = await getChannelName(message.channel);
 	    console.debug("channel:" + channelName);
+	    // Get the list of things to check for for this channel
 	    let regexList = getRegexForChannel(channelName);
+	    // Get the default response in case we don't match any of the things to check for above
 	    let response = getDefaultMessage(message);
+	    // Now check each regular expression and see if it is in the message sent in
 	    for (regex in regexList) {
 		console.debug("check regex:" + regexList[regex] + " \nWith: " + message.text);
 	    	if (message.text.match(new RegExp(regexList[regex], "i"))) {
@@ -60,22 +63,10 @@ app.message('goodbye', async ({message, say}) => {
     } else {
         threadTs = message.ts;
     }
-    var string = "See ya later <https://sfdc.co/dehub|Resource Hub>, <@${message.user}> :wave:".replace("${message.user}",message.user);
+    var string = "See ya later <@${message.user}> :wave:".replace("${message.user}",message.user);
     var string2 = `${string}`;
     // say() sends a message to the channel where the event was triggered
     await say({
-        text: string2,
-        thread_ts: threadTs
-    });
-    await say({
-        blocks: [{
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": string2
-                }
-            }
-        ],
         text: string2,
         thread_ts: threadTs
     });
