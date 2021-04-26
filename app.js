@@ -62,7 +62,7 @@ app.message('goodbye', async ({message, say}) => {
     }
     // say() sends a message to the channel where the event was triggered
     await say({
-        text: `See ya later, <@${message.user}> :wave:`,
+        text: "See ya later, <@${message.user}> :wave:",
         thread_ts: threadTs
     });
 });
