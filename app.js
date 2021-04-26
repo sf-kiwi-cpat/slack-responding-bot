@@ -10,7 +10,7 @@ const app = new App({
 const CHANNEL_REGEX_MAP = new Map();
 
 function buildMap() {
-    CHANNEL_REGEX_MAP.set('automated-responses', ["WhatsApp", "WeChat", "roadmap"]);
+    CHANNEL_REGEX_MAP.set('automated-responses', ["WhatsApp/i", "WeChat/i", "roadmap"]);
 }
 
 function getDefaultMessage(message)
@@ -33,7 +33,7 @@ app.message(async ({message, say}) => {
 	    let response = getDefaultMessage(message);
 	    for (regex in regexList) {
 		console.debug("check regex:" + regexList[regex] + " \nWith: " + message.text);
-	    	if (message.text.match(regexList[regex])) {
+	    	if (message.text.match(new RegExp(regexList[regex], "i"))) {
 			console.debug("matched regex:" + regexList[regex]);
 			response = getResponseText(regexList[regex], message, channelName);
 			break; 
