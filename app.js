@@ -32,7 +32,7 @@ function getDefaultMessage(message, channel)
 			defaultMessage =  `Thanks for posting <@${message.user}> - please check out the <https://sfdc.co/dehub|Resource Hub> for a quick answer. \n\nSelect the buttons below once you've searched the hub and this channel for your answer.`;
 			break;
 	}
-	return message;		
+	return defaultMessage;		
 }
 
 // Initialize the web client so we can call the API later
