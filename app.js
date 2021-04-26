@@ -10,7 +10,7 @@ const app = new App({
 const CHANNEL_REGEX_MAP = new Map();
 
 function buildMap() {
-    CHANNEL_REGEX_MAP.set('automated-responses', ["WhatsApp/i", "WeChat/i", "roadmap"]);
+    CHANNEL_REGEX_MAP.set('automated-responses', ["WhatsApp", "WeChat", "roadmap"]);
 }
 
 function getDefaultMessage(message)
