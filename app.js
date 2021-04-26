@@ -83,7 +83,7 @@ app.action('button_click_question', async ({body, ack, say }) => {
     handleButtonClick(body, say, "No worries, an expert will check this out and help as soon as they can.", "question");
 });
 
-
+// Function the calls the web API to get the name of a channel from the ID of it.
 async function getChannelName(channelId)
 {
 	let channelName = null;
@@ -204,7 +204,7 @@ async function handleButtonClick(body, say, message, reaction) {
 }
 
 
-
+// Code that runs on start-up of the app.
 (async () => {
     // Start your app
     await app.start(process.env.PORT || 3000);
