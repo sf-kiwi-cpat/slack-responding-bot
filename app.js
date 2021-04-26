@@ -104,7 +104,7 @@ function getResponseText(keyword, channelName) {
     let response = null;
     switch (keyword) {
         case "WhatsApp":
-            response = "WhatsApp response";
+            response = `Thanks for posting <@${message.user}> - please check out the WhatsApp FAQ (https://salesforce.quip.com/6OXXAavXPHhD#CEBACA8HR63) for a quick answer. \n\nSelect the buttons below once you've searched the Quip and this channel for your answer.`;
             break;
         case "WeChat":
 	    response = "WeChat response"	    
