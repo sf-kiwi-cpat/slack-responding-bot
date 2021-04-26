@@ -16,7 +16,7 @@ function buildMap() {
 function getDefaultMessage(message)
 {
     // Can't use a static variable/constant as it needs to evaluate the user at runtime.
-    return `Thanks for posting <@${message.user}> - please check out the Resource Hub (https://sfdc.co/dehub) for a quick answer. \n\nSelect the buttons below once you've searched the hub and this channel for your answer.`;
+    return `Thanks for posting <@${message.user}> - please check out the <https://sfdc.co/dehub|Resource Hub> for a quick answer. \n\nSelect the buttons below once you've searched the hub and this channel for your answer.`;
 }
 
 // Initialize
@@ -104,7 +104,7 @@ function getResponseText(keyword, message, channelName) {
     let response = null;
     switch (keyword) {
         case "WhatsApp":
-            response = `Thanks for posting <@${message.user}> - please check out the WhatsApp FAQ (https://salesforce.quip.com/6OXXAavXPHhD#CEBACA8HR63) for a quick answer. \n\nSelect the buttons below once you've searched the Quip and this channel for your answer.`;
+            response = `Thanks for posting <@${message.user}> - please check out the <https://salesforce.quip.com/6OXXAavXPHhD#CEBACA8HR63|WhatsApp FAQ> for a quick answer. \n\nSelect the buttons below once you've searched the Quip and this channel for your answer.`;
             break;
         case "WeChat":
 	    response = "WeChat response"	    
