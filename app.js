@@ -11,7 +11,7 @@ const client = new Client({
 
 client.connect();
 
-client.query('SELECT table_schema,table_name FROM information_schema.tables;', (err, res) => {
+client.query('SELECT name,channel__c,response__c,regular_expression__c,is_channel_default__c FROM Slack_Message_Response__c ORDER BY order__c;', (err, res) => {
   if (err) throw err;
   for (let row of res.rows) {
     console.log(JSON.stringify(row));
