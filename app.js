@@ -65,13 +65,13 @@ async function getDefaultMessage(message, channel)
 	}
 	console.debug("Calling to DB. Channel: " + channel);
 	const results = await pool.query('SELECT response__c FROM salesforce.Slack_Message_Response__c WHERE is_channel_default__c = true AND channel__c = $1;', [channel]);
-	console.debug("Called DB." + JSON.stringify(results));
 	if (results.rows) {
+		console.debug("Found results...");
 		for (let row of results.rows) {
-			console.debug(JSON.stringify(row));
+//			console.debug(JSON.stringify(row));
 			defaultMessage = row.response__c;
+			defaultMessage = defaultMessage.replace("${message.user}",message.user);
 			console.debug("Set defaultMessage to: " + defaultMessage);
-			defaultMessage.replace("${message.user}",message.user);
 			break;
 		}
 	}
