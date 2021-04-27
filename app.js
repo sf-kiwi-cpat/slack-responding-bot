@@ -38,7 +38,7 @@ function buildMap() {
 }
 
 // Get the default message as the fallback for a channel.
-function getDefaultMessage(message, channel)
+async function getDefaultMessage(message, channel)
 {
 	let defaultMessage = null;
 	// Can't use a static variable/constant as it needs to evaluate the user at runtime.
@@ -51,15 +51,25 @@ function getDefaultMessage(message, channel)
 			break;
 	}
 	
-	client.connect();
+	await client.connect();
 
-	client.query('SELECT response__c FROM salesforce.Slack_Message_Response__c WHERE is_channel_default__c = true AND channel__c = $1;', [channel] , (err, res) => {
-	  if (err) throw err;
-	  for (let row of res.rows) {
-	    defaultMessage = row[0];
-	  }
-	  client.end();
-	});
+	await client
+		.query('SELECT response__c FROM salesforce.Slack_Message_Response__c WHERE is_channel_default__c = true AND channel__c = $1;', [channel])
+		.then(result => {
+			for (let row of result.rows) {
+				defaultMessage = row[0];
+			}
+		})
+		.catch(e => console.error(e.stack))
+		.finally(client.end());
+		
+		//, (err, res) => {
+		//  if (err) throw err;
+		//  for (let row of res.rows) {
+		//    defaultMessage = row[0];
+		//  }
+		//  client.end();
+		//});
 	
 	return defaultMessage;
 }
@@ -77,7 +87,7 @@ app.message(async ({message, say}) => {
 	    // Get the list of things to check for for this channel
 	    let regexList = getRegexForChannel(channelName);
 	    // Get the default response in case we don't match any of the things to check for above
-	    let response = getDefaultMessage(message,channelName);
+	    let response =  await getDefaultMessage(message,channelName);
 	    // Now check each regular expression and see if it is in the message sent in
 	    for (let regex of regexList) {
 		console.debug("check regex:" + regex + " \nWith: " + message.text);
