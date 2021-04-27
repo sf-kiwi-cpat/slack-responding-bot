@@ -22,8 +22,11 @@ pool.on('error', (err, client) => {
 });
 
 const results = pool.query('SELECT name,channel__c,response__c,regular_expression__c,is_channel_default__c FROM salesforce.Slack_Message_Response__c ORDER BY order__c;');
-for (let row of results.rows) {
-	console.log(JSON.stringify(row));
+console.log(JSON.stringify(results));
+if (results.rows) {
+	for (let row of results.rows) {
+		console.log(JSON.stringify(row));
+	}
 }
 
 // Initializes your app with your bot token and signing secret
