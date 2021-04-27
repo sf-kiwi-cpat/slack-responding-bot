@@ -31,7 +31,7 @@ const BOT_RESPONSE_DIDNT_HELP = "No worries, an expert will check this out and h
 const BOT_RESPONSE_DIDNT_HELP_EMOTICON = "question";
 
 // Listens to all incoming messages - what is fired when a Slack message is sent in a channel this app is in.
-app.message(async ({message, say}) => {
+app.message('\?', async ({message, say}) => {
     // We don't care about messages sent within a thread, only reply to top level messages. So if the message has a thread_ts then ignore it
     if (!message.thread_ts && !message.hidden) {
 	    let channelName = await getChannelName(message.channel);
