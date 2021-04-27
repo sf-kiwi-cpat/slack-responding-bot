@@ -51,42 +51,20 @@ function buildMap() {
 }
 
 // Get the default message as the fallback for a channel.
-async function getDefaultMessage(message, channel)
+async function getDefaultMessage(message, channelName)
 {
-	let defaultMessage = null;
-	// Can't use a static variable/constant as it needs to evaluate the user at runtime.
-	switch (channel) {
-		case "automated-responses":
-    			defaultMessage =  `Thanks for posting <@${message.user}> - please check out the <https://sfdc.co/dehub|Resource Hub> for a quick answer. \n\nSelect the buttons below once you've searched the hub and this channel for your answer.`;
-			break;
-		case "selling-digital-engagement-and-einstein-bots":
-			defaultMessage =  `Thanks for posting <@${message.user}> - please check out the <https://sfdc.co/dehub|Resource Hub> for a quick answer. \n\nSelect the buttons below once you've searched the hub and this channel for your answer.`;
-			break;
-	}
-	console.debug("Calling to DB. Channel: " + channel);
-	const results = await pool.query('SELECT response__c FROM salesforce.Slack_Message_Response__c WHERE is_channel_default__c = true AND channel__c = $1;', [channel]);
+	let defaultMessage = `Thanks for posting <@${message.user}> - I'm just creating a thread for you to keep the channel tidy.`;
+	console.debug("Calling to DB. Channel: " + channelName);
+	const results = await pool.query('SELECT response__c FROM salesforce.Slack_Message_Response__c WHERE is_channel_default__c = true AND channel__c = $1;', [channelName]);
 	if (results.rows) {
 		console.debug("Found results...");
 		for (let row of results.rows) {
-//			console.debug(JSON.stringify(row));
 			defaultMessage = row.response__c;
 			defaultMessage = defaultMessage.replace("${message.user}",message.user);
 			console.debug("Set defaultMessage to: " + defaultMessage);
 			break;
 		}
 	}
-	
-	//await client.connect();
-
-	//await client
-	//	.query('SELECT response__c FROM salesforce.Slack_Message_Response__c WHERE is_channel_default__c = true AND channel__c = $1;', [channel])
-	//	.then(result => {
-	//		for (let row of result.rows) {
-	//			defaultMessage = row[0];
-	//		}
-	//	})
-	//	.catch(e => console.error(e.stack))
-	//	.finally(client.end());
 	
 	return defaultMessage;
 }
@@ -102,7 +80,7 @@ app.message(async ({message, say}) => {
 	    let channelName = await getChannelName(message.channel);
 	    console.debug("channel:" + channelName);
 	    // Get the list of things to check for for this channel
-	    let regexList = getRegexForChannel(channelName);
+	    let regexList = await getRegexForChannel(channelName);
 	    // Get the default response in case we don't match any of the things to check for above
 	    let response =  await getDefaultMessage(message,channelName);
 	    // Now check each regular expression and see if it is in the message sent in
@@ -110,7 +88,7 @@ app.message(async ({message, say}) => {
 		console.debug("check regex:" + regex + " \nWith: " + message.text);
 	    	if (message.text.match(new RegExp(regex, "i"))) {
 			console.debug("matched regex:" + regex);
-			response = getResponseText(regex, message, channelName);
+			response = await getResponseText(regex, message, channelName);
 			break; 
 		}
 	    }
@@ -119,13 +97,21 @@ app.message(async ({message, say}) => {
 });
 
 // Finds all the regular expressions we want to check the message for this channel
-function getRegexForChannel(channelName)
+async function getRegexForChannel(channelName)
 {
-	// If the map has an entry for this channel then return the associated list.
-	if (CHANNEL_REGEX_MAP.has(channelName)) {
-		return CHANNEL_REGEX_MAP.get(channelName);
+	// Go get the list of regular expressions for this slack channel
+	let regexList = [];
+	console.debug("Calling to DB. Channel: " + channelName);
+	const results = await pool.query('SELECT regular_expression__c FROM salesforce.Slack_Message_Response__c WHERE channel__c = $1;', [channelName]);
+	if (results.rows) {
+		console.debug("Found results...");
+		for (let row of results.rows) {
+			regexList.push(row.regular_expression__c);
+			console.debug("Add regex to list: " + row.regular_expression__c);
+		}
 	}
-	return null;
+
+	return regexList;
 }
 
 
@@ -181,16 +167,20 @@ async function getChannelName(channelId)
 
 // Decides what text is sent as a reply to the original message based on the keyword/regex that was matched
 function getResponseText(keyword, message, channelName) {
-    let response = null;
-    switch (keyword) {
-        case "WhatsApp":
-            response = `Thanks for posting <@${message.user}> - please check out the <https://salesforce.quip.com/6OXXAavXPHhD#CEBACA8HR63|WhatsApp FAQ> for a quick answer. \n\nSelect the buttons below once you've searched the Quip and this channel for your answer.`;
-            break;
-        case "WeChat":
-	    response = "WeChat response"	    
-    }
+        let response = null;
+	console.debug("Calling to DB. keyword: " + keyword + "Channel: " + channelName);
+	const results = await pool.query('SELECT response__c FROM salesforce.Slack_Message_Response__c WHERE regular_expression__c = $1 AND channel__c = $2;', [keyword,channelName]);
+	if (results.rows) {
+		console.debug("Found results...");
+		for (let row of results.rows) {
+			response = row.response__c;
+			response = response.replace("${message.user}",message.user);
+			console.debug("Set response to: " + response);
+			break;
+		}
+	}
 
-    return response;
+    	return response;
 }
 
 // Function that actually sends the reply, ensures it is threaded and includes buttons to respond/interact with.
