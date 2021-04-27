@@ -21,11 +21,15 @@ pool.on('error', (err, client) => {
     console.error('Error:', err);
 });
 
-const results = await pool.query('SELECT name,channel__c,response__c,regular_expression__c,is_channel_default__c FROM salesforce.Slack_Message_Response__c ORDER BY order__c;');
-console.log(JSON.stringify(results));
-if (results.rows) {
-	for (let row of results.rows) {
-		console.log(JSON.stringify(row));
+
+async function getAllResponses()
+{
+	const results = await pool.query('SELECT name,channel__c,response__c,regular_expression__c,is_channel_default__c FROM salesforce.Slack_Message_Response__c ORDER BY order__c;');
+	console.log(JSON.stringify(results));
+	if (results.rows) {
+		for (let row of results.rows) {
+			console.log(JSON.stringify(row));
+		}
 	}
 }
 
@@ -270,5 +274,6 @@ async function handleButtonClick(body, say, message, reaction) {
     // Start your app
     await app.start(process.env.PORT || 3000);
     buildMap();
+    getAllResponses();
     console.log('⚡️ Bolt app is running!');
 })();
