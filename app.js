@@ -63,11 +63,15 @@ async function getDefaultMessage(message, channel)
 			defaultMessage =  `Thanks for posting <@${message.user}> - please check out the <https://sfdc.co/dehub|Resource Hub> for a quick answer. \n\nSelect the buttons below once you've searched the hub and this channel for your answer.`;
 			break;
 	}
-	
+	console.debug("Calling to DB. Channel: " + channel);
 	const results = await pool.query('SELECT response__c FROM salesforce.Slack_Message_Response__c WHERE is_channel_default__c = true AND channel__c = $1;', [channel]);
+	console.debug("Called DB." + JSON.stringify(results));
 	if (results.rows) {
 		for (let row of results.rows) {
+			console.debug(JSON.stringify(row));
 			defaultMessage = row[0];
+			console.debug("Set defaultMessage to ": + defaultMessage);
+			defaultMessage.replace("${message.user}",message.user);
 			break;
 		}
 	}
