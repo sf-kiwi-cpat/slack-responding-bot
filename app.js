@@ -22,16 +22,6 @@ pool.on('error', (err, client) => {
 });
 
 
-async function getAllResponses()
-{
-	const results = await pool.query('SELECT name,channel__c,response__c,regular_expression__c,is_channel_default__c FROM salesforce.Slack_Message_Response__c ORDER BY order__c;');
-	if (results.rows) {
-		for (let row of results.rows) {
-			console.log(JSON.stringify(row));
-		}
-	}
-}
-
 // Initializes your app with your bot token and signing secret
 const app = new App({
     token: process.env.SLACK_BOT_TOKEN,
@@ -44,11 +34,6 @@ const BOT_RESPONSE_HELPED_EMOTICON = "white_check_mark";
 const BOT_RESPONSE_DIDNT_HELP = "No worries, an expert will check this out and help as soon as they can.";
 const BOT_RESPONSE_DIDNT_HELP_EMOTICON = "question";
 
-
-// This is called on the startup of the app - builds out the regular expressions to check per Slack channel
-function buildMap() {
-    CHANNEL_REGEX_MAP.set('automated-responses', ["WhatsApp", "WeChat", "roadmap"]);
-}
 
 // Get the default message as the fallback for a channel.
 async function getDefaultMessage(message, channelName)
@@ -88,6 +73,7 @@ app.message(async ({message, say}) => {
 		console.debug("check regex:" + slackResponse.regex + " \nWith: " + message.text);
 	    	if (message.text.match(new RegExp(slackResponse.regex, "i"))) {
 			console.debug("matched regex:" + slackResponse.regex);
+			// Replace username with the actual value
 			response = slackResponse.response.replace("${message.user}",message.user);
 			break; 
 		}
@@ -106,7 +92,7 @@ async function getSlackResponsesForChannel(channelName)
 	// Go get the list of regular expressions for this slack channel
 	let responseList = null;
 	console.debug("Calling to DB. Channel: " + channelName);
-	const results = await pool.query('SELECT regular_expression__c as regex, response__c as response FROM salesforce.Slack_Message_Response__c WHERE channel__c = $1;', [channelName]);
+	const results = await pool.query('SELECT regular_expression__c as regex, response__c as response FROM salesforce.Slack_Message_Response__c WHERE regular_expression__c IS NOT NULL AND channel__c = $1;', [channelName]);
 	if (results.rows) {
 		console.debug("Found results...");
 		responseList = results.rows;
@@ -114,23 +100,6 @@ async function getSlackResponsesForChannel(channelName)
 
 	return responseList;
 }
-
-
-// Listens to incoming messages that contain "goodbye"
-app.message('goodbye', async ({message, say}) => {
-    var threadTs;
-    if (message.thread_ts) {
-        threadTs = message.thread_ts;
-    } else {
-        threadTs = message.ts;
-    }
-    var string = "See ya later <https://sfdc.co/dehub|Resource Hub> <@${message.user}> :wave:".replace("${message.user}",message.user);
-    // say() sends a message to the channel where the event was triggered
-    await say({
-        text: string,
-        thread_ts: threadTs
-    });
-});
 
 // Called after the 'this helped me' button is clicked
 app.action('button_click_answered', async ({body, ack, say}) => {
@@ -163,25 +132,6 @@ async function getChannelName(channelId)
 	    console.error(error);
 	}
 	return channelName;
-}
-
-
-// Decides what text is sent as a reply to the original message based on the keyword/regex that was matched
-async function getResponseText(keyword, message, channelName) {
-        let response = null;
-	console.debug("Calling to DB. keyword: " + keyword + "Channel: " + channelName);
-	const results = await pool.query('SELECT response__c FROM salesforce.Slack_Message_Response__c WHERE regular_expression__c = $1 AND channel__c = $2;', [keyword,channelName]);
-	if (results.rows) {
-		console.debug("Found results...");
-		for (let row of results.rows) {
-			response = row.response__c;
-			response = response.replace("${message.user}",message.user);
-			console.debug("Set response to: " + response);
-			break;
-		}
-	}
-
-    	return response;
 }
 
 // Function that actually sends the reply, ensures it is threaded and includes buttons to respond/interact with.
@@ -275,7 +225,5 @@ async function handleButtonClick(body, say, message, reaction) {
 (async () => {
     // Start your app
     await app.start(process.env.PORT || 3000);
-    buildMap();
-    getAllResponses();
     console.log('⚡️ Bolt app is running!');
 })();
