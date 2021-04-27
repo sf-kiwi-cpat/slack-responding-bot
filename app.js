@@ -21,7 +21,7 @@ pool.on('error', (err, client) => {
     console.error('Error:', err);
 });
 
-const results = pool.query('SELECT name,channel__c,response__c,regular_expression__c,is_channel_default__c FROM salesforce.Slack_Message_Response__c ORDER BY order__c;');
+const results = await pool.query('SELECT name,channel__c,response__c,regular_expression__c,is_channel_default__c FROM salesforce.Slack_Message_Response__c ORDER BY order__c;');
 console.log(JSON.stringify(results));
 if (results.rows) {
 	for (let row of results.rows) {
