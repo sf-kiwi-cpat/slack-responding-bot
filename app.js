@@ -50,7 +50,18 @@ function getDefaultMessage(message, channel)
 			defaultMessage =  `Thanks for posting <@${message.user}> - please check out the <https://sfdc.co/dehub|Resource Hub> for a quick answer. \n\nSelect the buttons below once you've searched the hub and this channel for your answer.`;
 			break;
 	}
-	return defaultMessage;		
+	
+	client.connect();
+
+	client.query('SELECT response__c FROM salesforce.Slack_Message_Response__c WHERE is_channel_default__c = true AND channel__c = $1;', [channel] , (err, res) => {
+	  if (err) throw err;
+	  for (let row of res.rows) {
+	    defaultMessage = row[0];
+	  }
+	  client.end();
+	});
+	
+	return defaultMessage;
 }
 
 // Initialize the web client so we can call the API later
@@ -68,11 +79,11 @@ app.message(async ({message, say}) => {
 	    // Get the default response in case we don't match any of the things to check for above
 	    let response = getDefaultMessage(message,channelName);
 	    // Now check each regular expression and see if it is in the message sent in
-	    for (regex in regexList) {
-		console.debug("check regex:" + regexList[regex] + " \nWith: " + message.text);
-	    	if (message.text.match(new RegExp(regexList[regex], "i"))) {
-			console.debug("matched regex:" + regexList[regex]);
-			response = getResponseText(regexList[regex], message, channelName);
+	    for (let regex of regexList) {
+		console.debug("check regex:" + regex + " \nWith: " + message.text);
+	    	if (message.text.match(new RegExp(regex, "i"))) {
+			console.debug("matched regex:" + regex);
+			response = getResponseText(regex, message, channelName);
 			break; 
 		}
 	    }
