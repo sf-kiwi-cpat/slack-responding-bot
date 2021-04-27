@@ -25,7 +25,6 @@ pool.on('error', (err, client) => {
 async function getAllResponses()
 {
 	const results = await pool.query('SELECT name,channel__c,response__c,regular_expression__c,is_channel_default__c FROM salesforce.Slack_Message_Response__c ORDER BY order__c;');
-	console.log(JSON.stringify(results));
 	if (results.rows) {
 		for (let row of results.rows) {
 			console.log(JSON.stringify(row));
@@ -63,6 +62,14 @@ async function getDefaultMessage(message, channel)
 		case "selling-digital-engagement-and-einstein-bots":
 			defaultMessage =  `Thanks for posting <@${message.user}> - please check out the <https://sfdc.co/dehub|Resource Hub> for a quick answer. \n\nSelect the buttons below once you've searched the hub and this channel for your answer.`;
 			break;
+	}
+	
+	const results = await pool.query('SELECT response__c FROM salesforce.Slack_Message_Response__c WHERE is_channel_default__c = true AND channel__c = $1;', [channel]);
+	if (results.rows) {
+		for (let row of results.rows) {
+			defaultMessage = row[0];
+			break;
+		}
 	}
 	
 	//await client.connect();
