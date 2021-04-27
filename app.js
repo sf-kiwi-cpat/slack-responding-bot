@@ -1,23 +1,30 @@
 const {App} = require('@slack/bolt');
 const {WebClient} = require('@slack/web-api');
 const { Client } = require('pg');
+const { Pool } = require('pg');
 
-const client = new Client({
+//const client = new Client({
+//  connectionString: process.env.DATABASE_URL,
+//  ssl: {
+//    rejectUnauthorized: false
+//  }
+//});
+
+const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
     rejectUnauthorized: false
   }
 });
 
-client.connect();
-
-client.query('SELECT name,channel__c,response__c,regular_expression__c,is_channel_default__c FROM salesforce.Slack_Message_Response__c ORDER BY order__c;', (err, res) => {
-  if (err) throw err;
-  for (let row of res.rows) {
-    console.log(JSON.stringify(row));
-  }
-  client.end();
+pool.on('error', (err, client) => {
+    console.error('Error:', err);
 });
+
+const results = pool.query('SELECT name,channel__c,response__c,regular_expression__c,is_channel_default__c FROM salesforce.Slack_Message_Response__c ORDER BY order__c;');
+for (let row of results.rows) {
+	console.log(JSON.stringify(row));
+}
 
 // Initializes your app with your bot token and signing secret
 const app = new App({
@@ -51,25 +58,17 @@ async function getDefaultMessage(message, channel)
 			break;
 	}
 	
-	await client.connect();
+	//await client.connect();
 
-	await client
-		.query('SELECT response__c FROM salesforce.Slack_Message_Response__c WHERE is_channel_default__c = true AND channel__c = $1;', [channel])
-		.then(result => {
-			for (let row of result.rows) {
-				defaultMessage = row[0];
-			}
-		})
-		.catch(e => console.error(e.stack))
-		.finally(client.end());
-		
-		//, (err, res) => {
-		//  if (err) throw err;
-		//  for (let row of res.rows) {
-		//    defaultMessage = row[0];
-		//  }
-		//  client.end();
-		//});
+	//await client
+	//	.query('SELECT response__c FROM salesforce.Slack_Message_Response__c WHERE is_channel_default__c = true AND channel__c = $1;', [channel])
+	//	.then(result => {
+	//		for (let row of result.rows) {
+	//			defaultMessage = row[0];
+	//		}
+	//	})
+	//	.catch(e => console.error(e.stack))
+	//	.finally(client.end());
 	
 	return defaultMessage;
 }
