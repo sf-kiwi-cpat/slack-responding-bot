@@ -166,7 +166,7 @@ async function getChannelName(channelId)
 
 
 // Decides what text is sent as a reply to the original message based on the keyword/regex that was matched
-function getResponseText(keyword, message, channelName) {
+async function getResponseText(keyword, message, channelName) {
         let response = null;
 	console.debug("Calling to DB. keyword: " + keyword + "Channel: " + channelName);
 	const results = await pool.query('SELECT response__c FROM salesforce.Slack_Message_Response__c WHERE regular_expression__c = $1 AND channel__c = $2;', [keyword,channelName]);
