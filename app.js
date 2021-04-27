@@ -70,7 +70,7 @@ async function getDefaultMessage(message, channel)
 		for (let row of results.rows) {
 			console.debug(JSON.stringify(row));
 			defaultMessage = row[0];
-			console.debug("Set defaultMessage to ": + defaultMessage);
+			console.debug("Set defaultMessage to: " + defaultMessage);
 			defaultMessage.replace("${message.user}",message.user);
 			break;
 		}
