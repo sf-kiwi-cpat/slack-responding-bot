@@ -88,7 +88,7 @@ app.message(async ({message, say}) => {
 		console.debug("check regex:" + slackResponse.regex + " \nWith: " + message.text);
 	    	if (message.text.match(new RegExp(slackResponse.regex, "i"))) {
 			console.debug("matched regex:" + slackResponse.regex);
-			response = slackResponse.response;
+			response = slackResponse.response.replace("${message.user}",message.user);
 			break; 
 		}
 	    }
