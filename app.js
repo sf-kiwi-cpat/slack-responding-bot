@@ -59,6 +59,7 @@ const web = new WebClient(process.env.SLACK_BOT_TOKEN);
 
 // Listens to all incoming messages
 app.message(async ({message, say}) => {
+    console.debug(say);
     console.debug(message);
     // We don't care about messages sent within a thread, only reply to top level messages. So if the message has a thread_ts then ignore it
     if (!message.thread_ts && !message.hidden) {
