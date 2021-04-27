@@ -1,8 +1,8 @@
 const {App} = require('@slack/bolt');
 const {WebClient} = require('@slack/web-api');
-const { Client } = require('pg');
 const { Pool } = require('pg');
 
+// Connect to the Heroku Postgres database
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
@@ -10,6 +10,7 @@ const pool = new Pool({
   }
 });
 
+// Callback on any errors when querying the Database
 pool.on('error', (err, client) => {
     console.error('Error:', err);
 });
@@ -23,11 +24,11 @@ const app = new App({
     signingSecret: process.env.SLACK_SIGNING_SECRET
 });
 
+// Constants for the responses when buttons are clicked.
 const BOT_RESPONSE_HELPED = "Glad I could help, happy selling!";
 const BOT_RESPONSE_HELPED_EMOTICON = "white_check_mark";
 const BOT_RESPONSE_DIDNT_HELP = "No worries, an expert will check this out and help as soon as they can.";
 const BOT_RESPONSE_DIDNT_HELP_EMOTICON = "question";
-
 
 // Listens to all incoming messages - what is fired when a Slack message is sent in a channel this app is in.
 app.message(async ({message, say}) => {
