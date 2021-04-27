@@ -80,38 +80,39 @@ app.message(async ({message, say}) => {
 	    let channelName = await getChannelName(message.channel);
 	    console.debug("channel:" + channelName);
 	    // Get the list of things to check for for this channel
-	    let regexList = await getRegexForChannel(channelName);
+	    let responseList = await getSlackResponsesForChannel(channelName);
 	    // Get the default response in case we don't match any of the things to check for above
-	    let response =  await getDefaultMessage(message,channelName);
+	    let response = null;
 	    // Now check each regular expression and see if it is in the message sent in
-	    for (let regex of regexList) {
-		console.debug("check regex:" + regex + " \nWith: " + message.text);
-	    	if (message.text.match(new RegExp(regex, "i"))) {
-			console.debug("matched regex:" + regex);
-			response = await getResponseText(regex, message, channelName);
+	    for (let slackResponse of responseList) {
+		console.debug("check regex:" + slackResponse.regex + " \nWith: " + message.text);
+	    	if (message.text.match(new RegExp(slackResponse.regex, "i"))) {
+			console.debug("matched regex:" + slackResponse.regex);
+			response = slackResponse.response;
 			break; 
 		}
+	    }
+	    // If we didn't set a response above then get the default.
+	    if (!response) {
+		     response = await getDefaultMessage(message,channelName);
 	    }
 	    sendReply(message, say, response);    
     }
 });
 
 // Finds all the regular expressions we want to check the message for this channel
-async function getRegexForChannel(channelName)
+async function getSlackResponsesForChannel(channelName)
 {
 	// Go get the list of regular expressions for this slack channel
-	let regexList = [];
+	let responseList = null;
 	console.debug("Calling to DB. Channel: " + channelName);
-	const results = await pool.query('SELECT regular_expression__c FROM salesforce.Slack_Message_Response__c WHERE channel__c = $1;', [channelName]);
+	const results = await pool.query('SELECT regular_expression__c as regex, response__c as response FROM salesforce.Slack_Message_Response__c WHERE channel__c = $1;', [channelName]);
 	if (results.rows) {
 		console.debug("Found results...");
-		for (let row of results.rows) {
-			regexList.push(row.regular_expression__c);
-			console.debug("Add regex to list: " + row.regular_expression__c);
-		}
+		responseList = results.rows;
 	}
 
-	return regexList;
+	return responseList;
 }
 
 
