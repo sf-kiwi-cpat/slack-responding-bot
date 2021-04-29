@@ -1,61 +1,57 @@
-# Deploying to Heroku ⚡️ Bolt for JavaScript
+# Selling Assistant App for Slack
 
-> Slack app example from 📚 [Deploying to Heroku with Bolt for JavaScript][1]
+> An app to help Account Executives get answers fast, and help Solution Engineers spend their time wisely.
 
 ## Overview
 
-This is a Slack app built with the [Bolt for JavaScript framework][2] that showcases
-deploying to the [Heroku platform][3].
+This app listens to messages sent within channels it is added to, and responds in thread as appropriate. To determine the response to send, it looks up all configured responses for that channel, runs the associated regular expression for that response against the message sent, and if it matches, responds accordingly.
 
-## Deploy to Heroku
+The Slack Responses are configured as a Custom Object in a Salesforce Org - these are accessed by the app via a Postgres database, which is updated via Heroku Connect.
 
-### 1. Initialize a Git repository
+## How it works
 
-```zsh
-# Initialize Git repository
-git init
+### Message Responses created
 
-# Commit this project
-git add .
-git commit -am "Initial commit"
+The first step for using this app requires that each channel it is added to has a set of responses that it may give based on the question. The responses are captured in a Salesforce Org, with a new Custom Object called 'Slack_Message_Response__c'. 
+This object has these fields:
+- Name
+- Channel
+- Regular Expression
+- Response
+- Is Channel Default
+- Order
 
-# Rename master to main (optional)
-git branch -m main
-```
+Each channel that this app is added to should have at least a default response. 
 
-### 2. Create a Heroku app
+### Slack Message Sent
 
-```zsh
-heroku create
-```
+Once a message is sent in a channel the app is a part of, an event is fired and caught by the App. The app will only process the event if it contains a question make (?) and it is a top level message (i.e. is to the channel, and not part of a thread). 
 
-### 3. Set Heroku environment variables
+Once it has confirmed it will process it, the app then looks up the channel to find the name (only the ID is part of the event message), before then querying the database for all configured responses for that channel, ordered by the 'order' field (starting with 1).
 
-```zsh
-heroku config:set SLACK_SIGNING_SECRET=<your-signing-secret>
-heroku config:set SLACK_BOT_TOKEN=xoxb-<your-bot-token>
-```
+One it has the list of responses, it will run a regular expression check against the message that was sent - if it matches, it will respond with the associated message. If none of the regular expressions are matched for this channel, it will use the default response back to the original poster.
 
-### 4. Deploy to Heroku
 
-```zsh
-# Deploy to Heroku
-git push heroku main
+### Slack Message Response
 
-# Start web server on Heroku
-heroku ps:scale web=1
-```
+The response that sent will also include 2 buttons - one that the user should press if the response answered their question, and the other if it didn't. Once those buttons are clicked, the App will send a reaction to the top level post - either a check mark to indicate it is answered, or a question mark to indicate help is still required. This is to help SE's who monitor the selling channels to know if an answer is still required for the question that was asked, so they can spend more time answering difficult questions, rather than pointing to content that already exists.
 
-### 5. Create Slack App
+The app will also response with a message in the thread as appropriate - either saying it was glad that it could help, or that an expert will take a look when they have a moment.
 
-1. Follow the [Getting Started with Bolt for JavaScript][4] guide to:
-    - Create a Slack app
-    - Add required scopes
-    - Subscribe to required events 
-2. Follow the [Deploying to Heroku with Bolt for JavaScript][1] guide to:
-    - Update your **Request URL** for actions and events
+### Adding a new Channel
 
-[1]: https://slack.dev/bolt-js/deployments/heroku
-[2]: https://slack.dev/bolt-js/
-[3]: https://heroku.com/
-[4]: https://slack.dev/bolt-js/tutorial/getting-started
+To add a new channel, you will first need to add responses to the Salesforce Org. The easiest way is to enter them into [this Spreadsheet][3] - you can then let Craig Paterson know and he can load them into the appropriate org.
+
+Once they are in there, you can add the bot to your channel through Slack, and it should start responding to any questions posted. 
+
+
+
+
+
+
+#### Notes
+This is a Slack app built with the [Bolt for JavaScript framework][1] that is deployed to the [Heroku platform][2].
+
+[1]: https://slack.dev/bolt-js/
+[2]: https://heroku.com/
+[3]: https://docs.google.com/spreadsheets/d/1euE3hOFdM6R2rd57g3Gjo_b-oewtctE_LcPvOrMn3Z0/edit#gid=0
