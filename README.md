@@ -4,9 +4,9 @@
 
 ## Overview
 
-This app listens to messages sent within channels it is added to, and responds in thread as appropriate. To determine the response to send, it looks up all configured responses for that channel, runs the associated regular expression for that response against the message sent, and if it matches, responds accordingly.
+This app listens to Slack messages sent within Slack channels it is added to, and responds in thread as appropriate. To determine the response to send, it looks up previously configured 'Slack Message Responses' for that channel, runs the associated regular expression for that response against the message sent, and if it matches, responds accordingly.
 
-The Slack Responses are configured as a Custom Object in a Salesforce Org - these are accessed by the app via a Postgres database, which is updated via Heroku Connect.
+The 'Slack Message Responses' are configured as a Custom Object in a Salesforce Org - these are accessed by the app via a Postgres database, which is updated via Heroku Connect.
 
 ## How it works
 
@@ -34,7 +34,7 @@ One it has the list of responses, it will run a regular expression check against
 
 ### Slack Message Response
 
-The response that sent will also include 2 buttons - one that the user should press if the response answered their question, and the other if it didn't. Once those buttons are clicked, the App will send a reaction to the top level post - either a check mark to indicate it is answered, or a question mark to indicate help is still required. This is to help SE's who monitor the selling channels to know if an answer is still required for the question that was asked, so they can spend more time answering difficult questions, rather than pointing to content that already exists.
+The response that sent will also include 2 buttons - one that the user should press if the response answered their question, and the other if it didn't. Once those buttons are clicked, the App will send a reaction to the top level post - either a check mark ✅ to indicate it is answered, or a question mark❓ to indicate help is still required. This is to help SE's who monitor the selling channels to know if an answer is still required for the question that was asked, so they can spend more time answering difficult questions, rather than pointing to content that already exists.
 
 The app will also response with a message in the thread as appropriate - either saying it was glad that it could help, or that an expert will take a look when they have a moment.
 
