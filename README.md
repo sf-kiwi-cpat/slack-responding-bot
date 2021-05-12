@@ -25,9 +25,9 @@ Each channel that this app is added to should have at least a default response.
 
 ### Slack Message Sent
 
-Once a message is sent in a channel the app is a part of, an event is fired and caught by the App. The app will only process the event if it contains a question make (?) and it is a top level message (i.e. is to the channel, and not part of a thread). 
+Once a message is sent in a channel the app is a part of, an event is fired and caught by the App. The app will only process the event if it contains a question mark (?) and it is a top level message (i.e. is to the channel, and not part of a thread). 
 
-Once it has confirmed it will process it, the app then looks up the channel to find the name (only the ID is part of the event message), before then querying the database for all configured responses for that channel, ordered by the 'order' field (starting with 1).
+Once it has confirmed it will process it, the app then looks up the channel to find the name (only the ID is part of the event message), before then querying the database for all configured responses for that channel, ordered by the 'order' field (lowest number has the highest priority (i.e. starts at 1)).
 
 One it has the list of responses, it will run a regular expression check against the message that was sent - if it matches, it will respond with the associated message. If none of the regular expressions are matched for this channel, it will use the default response back to the original poster.
 
