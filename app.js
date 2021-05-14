@@ -29,6 +29,8 @@ const BOT_RESPONSE_HELPED = "Glad I could help, happy selling!";
 const BOT_RESPONSE_HELPED_EMOTICON = "white_check_mark";
 const BOT_RESPONSE_DIDNT_HELP = "No worries, an expert will check this out and help as soon as they can.";
 const BOT_RESPONSE_DIDNT_HELP_EMOTICON = "question";
+const BOT_RESPONSE_HELPED_BUTTON = ":white_check_mark: Thanks, I found my answer";
+const BOT_RESPONSE_DIDNT_HELP_BUTTON = "I searched but still need help";
 
 // Listens to all incoming messages that contain a ? in them - this is what is fired when a Slack message is sent in a channel this app is in.
 app.message('\?', async ({message, say}) => {
@@ -100,7 +102,7 @@ async function getChannelName(channelId)
 {
 	let channelName = null;
 	try {
-	    // Call reactions.add with the built-in client
+	    // Call conversations.info with the built-in client to get the name of the channel based on the ID
 	    const channelResult = await web.conversations.info({
 		channel: channelId
 	    });
@@ -139,7 +141,7 @@ async function sendReply(message, say, phrase) {
                         "style": "primary",
                         "text": {
                             "type": "plain_text",
-                            "text": ":white_check_mark: Thanks, I found my answer",
+                            "text": BOT_RESPONSE_HELPED_BUTTON,
                             "emoji": true
                         },
                         "action_id": "button_click_answered"
@@ -149,7 +151,7 @@ async function sendReply(message, say, phrase) {
                         "style": "danger",
                         "text": {
                             "type": "plain_text",
-                            "text": "I searched but still need help",
+                            "text": BOT_RESPONSE_DIDNT_HELP_BUTTON,
                             "emoji": true
                         },
                         "action_id": "button_click_question"
