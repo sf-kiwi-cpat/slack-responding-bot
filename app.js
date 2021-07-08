@@ -133,7 +133,7 @@ async function sendReply(message, say, phrase, showButtons) {
         threadTs = message.ts;
     }
     // Send the response
-    if (showButtons === true)
+    if (showButtons)
     {
 	    await say({
 		blocks: [{
