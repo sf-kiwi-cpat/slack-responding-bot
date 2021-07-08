@@ -49,7 +49,7 @@ app.message('\?', async ({message, say}) => {
 			console.debug("matched regex:" + slackResponse.regex);
 			// Use the response value from the original DB search, but replace the username with the actual value
 			response = slackResponse.response.replace("${message.user}",message.user);
-			showButtons = slackResponse.showButtons;
+			showButtons = slackResponse.show_buttons;
 			console.debug("Set showButtons to: " + showButtons);
 			break; 
 		}
@@ -72,14 +72,14 @@ async function getDefaultMessage(message, channelName)
 	let defaultMessage = `Thanks for posting <@${message.user}> - I'm just creating a thread for you to keep the channel tidy.`;
 	let showButtons = false; // By default don't add buttons
 	//console.debug("Calling to DB. Channel: " + channelName);
-	const results = await pool.query('SELECT response__c as response, show_buttons__c as showButtons FROM salesforce.Slack_Message_Response__c WHERE is_channel_default__c = true AND Is_Active__c = true AND channel__c = $1;', [channelName]);
+	const results = await pool.query('SELECT response__c as response, show_buttons__c as show_buttons FROM salesforce.Slack_Message_Response__c WHERE is_channel_default__c = true AND Is_Active__c = true AND channel__c = $1;', [channelName]);
 	if (results.rows) {
 		console.debug("Found results for default message for channel: " + channelName);
 		for (let row of results.rows) {
 			defaultMessage = row.response;
 			defaultMessage = defaultMessage.replace("${message.user}",message.user);
 			console.debug("Set defaultMessage to: " + defaultMessage);
-			showButtons = row.showButtons;
+			showButtons = row.show_buttons;
 			console.debug("Set showButtons to: " + showButtons);
 			break;
 		}
@@ -97,7 +97,7 @@ async function getSlackResponsesForChannel(channelName)
 	// Go get the list of regular expressions for this slack channel
 	let responseList = null;
 	//console.debug("Calling to DB. Channel: " + channelName);
-	const results = await pool.query('SELECT regular_expression__c as regex, response__c as response, show_buttons__c as showButtons FROM salesforce.Slack_Message_Response__c WHERE regular_expression__c IS NOT NULL AND Is_Active__c = true AND channel__c = $1;', [channelName]);
+	const results = await pool.query('SELECT regular_expression__c as regex, response__c as response, show_buttons__c as show_buttons FROM salesforce.Slack_Message_Response__c WHERE regular_expression__c IS NOT NULL AND Is_Active__c = true AND channel__c = $1;', [channelName]);
 	if (results.rows) {
 		console.debug("Found results for slack responses for channel: "+ channelName);
 		responseList = results.rows;
