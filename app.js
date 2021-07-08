@@ -50,7 +50,6 @@ app.message('\?', async ({message, say}) => {
 			// Use the response value from the original DB search, but replace the username with the actual value
 			response = slackResponse.response.replace("${message.user}",message.user);
 			showButtons = slackResponse.show_buttons;
-			console.debug("Set showButtons to: " + showButtons);
 			break; 
 		}
 	    }
@@ -80,7 +79,6 @@ async function getDefaultMessage(message, channelName)
 			defaultMessage = defaultMessage.replace("${message.user}",message.user);
 			console.debug("Set defaultMessage to: " + defaultMessage);
 			showButtons = row.show_buttons;
-			console.debug("Set showButtons to: " + showButtons);
 			break;
 		}
 	}
