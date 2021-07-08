@@ -50,6 +50,7 @@ app.message('\?', async ({message, say}) => {
 			// Use the response value from the original DB search, but replace the username with the actual value
 			response = slackResponse.response.replace("${message.user}",message.user);
 			showButtons = slackResponse.showButtons;
+			console.debug("Set showButtons to: " + showButtons);
 			break; 
 		}
 	    }
@@ -71,7 +72,7 @@ async function getDefaultMessage(message, channelName)
 	let defaultMessage = `Thanks for posting <@${message.user}> - I'm just creating a thread for you to keep the channel tidy.`;
 	let showButtons = false; // By default don't add buttons
 	//console.debug("Calling to DB. Channel: " + channelName);
-	const results = await pool.query('SELECT response__c, Show_Buttons__c as showButtons FROM salesforce.Slack_Message_Response__c WHERE is_channel_default__c = true AND Is_Active__c = true AND channel__c = $1;', [channelName]);
+	const results = await pool.query('SELECT response__c, show_buttons__c as showButtons FROM salesforce.Slack_Message_Response__c WHERE is_channel_default__c = true AND Is_Active__c = true AND channel__c = $1;', [channelName]);
 	if (results.rows) {
 		console.debug("Found results for default message for channel: " + channelName);
 		for (let row of results.rows) {
@@ -79,6 +80,7 @@ async function getDefaultMessage(message, channelName)
 			defaultMessage = defaultMessage.replace("${message.user}",message.user);
 			console.debug("Set defaultMessage to: " + defaultMessage);
 			showButtons = row.showButtons;
+			console.debug("Set showButtons to: " + showButtons);
 			break;
 		}
 	}
