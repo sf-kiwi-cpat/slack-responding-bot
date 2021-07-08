@@ -20,6 +20,8 @@ This object has these fields:
 - Response
 - Is Channel Default
 - Order
+- Is Active
+- Show Buttons
 
 Each channel that this app is added to should have at least a default response. 
 
@@ -34,7 +36,7 @@ One it has the list of responses, it will run a regular expression check against
 
 ### Slack Message Response
 
-The response that sent will also include 2 buttons - one that the user should press if the response answered their question, and the other if it didn't. Once those buttons are clicked, the App will send a reaction to the top level post - either a check mark ✅ to indicate it is answered, or a question mark❓ to indicate help is still required. This is to help SE's who monitor the selling channels to know if an answer is still required for the question that was asked, so they can spend more time answering difficult questions, rather than pointing to content that already exists.
+The response that sent will also include 2 buttons (if 'showButtons' is true) - one that the user should press if the response answered their question, and the other if it didn't. Once those buttons are clicked, the App will send a reaction to the top level post - either a check mark ✅ to indicate it is answered, or a question mark❓ to indicate help is still required. This is to help experts who monitor the selling channels to know if an answer is still required for the question that was asked, so they can spend more time answering difficult questions, rather than pointing to content that already exists.
 
 The app will also response with a message in the thread as appropriate - either saying it was glad that it could help, or that an expert will take a look when they have a moment.
 

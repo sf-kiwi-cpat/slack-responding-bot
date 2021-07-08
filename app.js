@@ -41,6 +41,7 @@ app.message('\?', async ({message, say}) => {
 	    let responseList = await getSlackResponsesForChannel(channelName);
 	    // Get the default response in case we don't match any of the things to check for above
 	    let response = null;
+	    let showButtons = true; // determines if the buttons are shown after the message or not
 	    // Now check each regular expression and see if it is in the message sent in
 	    for (let slackResponse of responseList) {
 		//console.debug("check regex:" + slackResponse.regex + " \nWith: " + message.text);
@@ -48,14 +49,18 @@ app.message('\?', async ({message, say}) => {
 			console.debug("matched regex:" + slackResponse.regex);
 			// Use the response value from the original DB search, but replace the username with the actual value
 			response = slackResponse.response.replace("${message.user}",message.user);
+			showButtons = slackResponse.show_buttons;
 			break; 
 		}
 	    }
 	    // If we didn't set a response above then get the default.
 	    if (!response) {
-		     response = await getDefaultMessage(message,channelName);
+		    let slackResponse = await getDefaultMessage(message,channelName);
+		    response = slackResponse.response;
+		    showButtons = slackResponse.showButtons;
 	    }
-	    sendReply(message, say, response);    
+	    console.debug("showButtons:" + showButtons);
+	    sendReply(message, say, response, showButtons);    
     }
 });
 
@@ -64,19 +69,21 @@ app.message('\?', async ({message, say}) => {
 async function getDefaultMessage(message, channelName)
 {
 	let defaultMessage = `Thanks for posting <@${message.user}> - I'm just creating a thread for you to keep the channel tidy.`;
+	let showButtons = false; // By default don't add buttons
 	//console.debug("Calling to DB. Channel: " + channelName);
-	const results = await pool.query('SELECT response__c FROM salesforce.Slack_Message_Response__c WHERE is_channel_default__c = true AND Is_Active__c = true AND channel__c = $1;', [channelName]);
+	const results = await pool.query('SELECT response__c as response, show_buttons__c as show_buttons FROM salesforce.Slack_Message_Response__c WHERE is_channel_default__c = true AND Is_Active__c = true AND channel__c = $1;', [channelName]);
 	if (results.rows) {
 		console.debug("Found results for default message for channel: " + channelName);
 		for (let row of results.rows) {
-			defaultMessage = row.response__c;
+			defaultMessage = row.response;
 			defaultMessage = defaultMessage.replace("${message.user}",message.user);
 			console.debug("Set defaultMessage to: " + defaultMessage);
+			showButtons = row.show_buttons;
 			break;
 		}
 	}
-	
-	return defaultMessage;
+	// Return an inline object with the response and the show/hide buttons boolean value
+	return { response: defaultMessage, showButtons: showButtons };
 }
 
 
@@ -88,7 +95,7 @@ async function getSlackResponsesForChannel(channelName)
 	// Go get the list of regular expressions for this slack channel
 	let responseList = null;
 	//console.debug("Calling to DB. Channel: " + channelName);
-	const results = await pool.query('SELECT regular_expression__c as regex, response__c as response FROM salesforce.Slack_Message_Response__c WHERE regular_expression__c IS NOT NULL AND Is_Active__c = true AND channel__c = $1;', [channelName]);
+	const results = await pool.query('SELECT regular_expression__c as regex, response__c as response, show_buttons__c as show_buttons FROM salesforce.Slack_Message_Response__c WHERE regular_expression__c IS NOT NULL AND Is_Active__c = true AND channel__c = $1;', [channelName]);
 	if (results.rows) {
 		console.debug("Found results for slack responses for channel: "+ channelName);
 		responseList = results.rows;
@@ -117,7 +124,7 @@ async function getChannelName(channelId)
 }
 
 // Function that actually sends the reply, ensures it is threaded and includes buttons to respond/interact with.
-async function sendReply(message, say, phrase) {
+async function sendReply(message, say, phrase, showButtons) {
     // Get the thread timestamp so we can reply in thread
     var threadTs;
     if (message.thread_ts) {
@@ -125,43 +132,60 @@ async function sendReply(message, say, phrase) {
     } else {
         threadTs = message.ts;
     }
-    // Send the repsonse
-    await say({
-        blocks: [{
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": phrase
-                }
-            },
-            {
-                "type": "actions",
-                "elements": [{
-                        "type": "button",
-                        "style": "primary",
-                        "text": {
-                            "type": "plain_text",
-                            "text": BOT_RESPONSE_HELPED_BUTTON,
-                            "emoji": true
-                        },
-                        "action_id": "button_click_answered"
-                    },
-                    {
-                        "type": "button",
-                        "style": "danger",
-                        "text": {
-                            "type": "plain_text",
-                            "text": BOT_RESPONSE_DIDNT_HELP_BUTTON,
-                            "emoji": true
-                        },
-                        "action_id": "button_click_question"
-                    }
-                ]
-            }
-        ],
-        text: phrase,
-        thread_ts: threadTs
-    });
+    // Send the response
+    if (showButtons)
+    {
+	    await say({
+		blocks: [{
+			"type": "section",
+			"text": {
+			    "type": "mrkdwn",
+			    "text": phrase
+			}
+		    },
+		    {
+			"type": "actions",
+			"elements": [{
+				"type": "button",
+				"style": "primary",
+				"text": {
+				    "type": "plain_text",
+				    "text": BOT_RESPONSE_HELPED_BUTTON,
+				    "emoji": true
+				},
+				"action_id": "button_click_answered"
+			    },
+			    {
+				"type": "button",
+				"style": "danger",
+				"text": {
+				    "type": "plain_text",
+				    "text": BOT_RESPONSE_DIDNT_HELP_BUTTON,
+				    "emoji": true
+				},
+				"action_id": "button_click_question"
+			    }
+			]
+		    }
+		],
+		text: phrase,
+		thread_ts: threadTs
+	    });
+    }
+    else {
+	 await say({
+		blocks: [{
+			"type": "section",
+			"text": {
+			    "type": "mrkdwn",
+			    "text": phrase
+			}
+		    }
+		],
+		text: phrase,
+		thread_ts: threadTs
+	    });    
+    }
 }
 
 
