@@ -59,6 +59,7 @@ app.message('\?', async ({message, say}) => {
 		    response = slackResponse.response;
 		    showButtons = slackResponse.showButtons;
 	    }
+	    console.debug("showButtons:" + showButtons);
 	    sendReply(message, say, response, showButtons);    
     }
 });
@@ -94,7 +95,7 @@ async function getSlackResponsesForChannel(channelName)
 	// Go get the list of regular expressions for this slack channel
 	let responseList = null;
 	//console.debug("Calling to DB. Channel: " + channelName);
-	const results = await pool.query('SELECT regular_expression__c as regex, response__c as response, Show_Buttons__c as showButtons FROM salesforce.Slack_Message_Response__c WHERE regular_expression__c IS NOT NULL AND Is_Active__c = true AND channel__c = $1;', [channelName]);
+	const results = await pool.query('SELECT regular_expression__c as regex, response__c as response, show_buttons__c as showButtons FROM salesforce.Slack_Message_Response__c WHERE regular_expression__c IS NOT NULL AND Is_Active__c = true AND channel__c = $1;', [channelName]);
 	if (results.rows) {
 		console.debug("Found results for slack responses for channel: "+ channelName);
 		responseList = results.rows;
@@ -132,7 +133,7 @@ async function sendReply(message, say, phrase, showButtons) {
         threadTs = message.ts;
     }
     // Send the response
-    if (showButtons)
+    if (showButtons === true)
     {
 	    await say({
 		blocks: [{
