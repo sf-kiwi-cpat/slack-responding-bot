@@ -199,6 +199,7 @@ async function sendReply(message, say, phrase, showButtons) {
 
 // Function that increments the count for the number of times a message has been sent in Slack
 async function incrementSentCount(messageId) {
+	console.debug("Incrementing sent count for message ID: " + messageId);
 	if (messageId)
 	{
 		const results = await pool.query('UPDATE salesforce.Slack_Message_Response__c SET sent__c = sent__c + 1 WHERE id = $1;', [messageId]);
