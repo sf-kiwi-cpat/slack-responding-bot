@@ -79,7 +79,7 @@ async function getDefaultMessage(message, channelName)
 	let showButtons = false; // By default don't add buttons
 	let id = null;
 	//console.debug("Calling to DB. Channel: " + channelName);
-	const results = await pool.query('SELECT response__c as response, show_buttons__c as show_buttons FROM salesforce.Slack_Message_Response__c WHERE is_channel_default__c = true AND Is_Active__c = true AND channel__c = $1;', [channelName]);
+	const results = await pool.query('SELECT id, response__c as response, show_buttons__c as show_buttons FROM salesforce.Slack_Message_Response__c WHERE is_channel_default__c = true AND Is_Active__c = true AND channel__c = $1;', [channelName]);
 	if (results.rows) {
 		console.debug("Found results for default message for channel: " + channelName);
 		for (let row of results.rows) {
