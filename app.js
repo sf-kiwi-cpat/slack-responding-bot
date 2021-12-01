@@ -69,9 +69,9 @@ app.message('\?', async ({message, say}) => {
 
 
 // Get the default message as the fallback for a channel.
-async function getDefaultMessage(message, channelName)
+async function getDefaultMessage(messageObj, channelName)
 {
-	let message = `Thanks for posting <@${message.user}> - I'm just creating a thread for you to keep the channel tidy.`;
+	let message = `Thanks for posting <@${messageObj.user}> - I'm just creating a thread for you to keep the channel tidy.`;
 	let showButtons = false; // By default don't add buttons
 	let id = null;
 	//console.debug("Calling to DB. Channel: " + channelName);
@@ -81,7 +81,7 @@ async function getDefaultMessage(message, channelName)
 		for (let row of results.rows) {
 			id = row.id;
 			message = row.response;
-			message = defaultMessage.replace("${message.user}",message.user);
+			message = message.replace("${messageObj.user}",messageObj.user);
 			console.debug("Set defaultMessage to: " + message);
 			showButtons = row.show_buttons;
 			break;
