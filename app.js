@@ -198,7 +198,7 @@ async function sendReply(message, say, phrase, showButtons) {
 async function incrementSentCount(messageId) {
 	if (messageId)
 	{
-		const results = await pool.query('UPDATE salesforce.Slack_Message_Response__c SET sent__c = sent__c + 1 WHERE id = $1;', [messageId]);
+		//const results = await pool.query('UPDATE salesforce.Slack_Message_Response__c SET sent__c = sent__c + 1 WHERE id = $1;', [messageId]);
 	}
 }
 
