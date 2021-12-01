@@ -20,8 +20,13 @@ const web = new WebClient(process.env.SLACK_BOT_TOKEN);
 
 // Initializes your app with your bot token and signing secret
 const app = new App({
-    token: process.env.SLACK_BOT_TOKEN,
-    signingSecret: process.env.SLACK_SIGNING_SECRET
+	token: process.env.SLACK_BOT_TOKEN,
+	signingSecret: process.env.SLACK_SIGNING_SECRET,
+	socketMode: true,
+	appToken: process.env.SLACK_APP_TOKEN,
+	// Socket Mode doesn't listen on a port, but in case you want your app to respond to OAuth,
+	// you still need to listen on some port!
+	port: process.env.PORT || 3000
 });
 
 // Constants for the responses when buttons are clicked.
