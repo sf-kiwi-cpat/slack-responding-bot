@@ -37,7 +37,8 @@ app.message('\?', async ({message, say}) => {
     // We don't care about messages sent within a thread, only reply to top level messages. So if the message has a thread_ts then ignore it
     if (!message.thread_ts && !message.hidden) {
 	let channelName = await getChannelName(message.channel);
-	    // Get the list of things to check for for this channel
+	console.debug("Handling message for channel: " + channelName);
+	// Get the list of things to check for for this channel
 	let responseList = await getSlackResponsesForChannel(channelName);
 	    // Get the default response in case we don't match any of the things to check for above
 	    let response, messageId = null;
@@ -61,7 +62,7 @@ app.message('\?', async ({message, say}) => {
 		    showButtons = slackResponse.showButtons;
 		    messageId = slackResponse.id;
 	    }
-	    console.debug("showButtons:" + showButtons);
+	    //console.debug("showButtons:" + showButtons);
 	    sendReply(message, say, response, showButtons);
 	    incrementSentCount(messageId);
     }
@@ -69,26 +70,26 @@ app.message('\?', async ({message, say}) => {
 
 
 // Get the default message as the fallback for a channel.
-async function getDefaultMessage(messageObj, channelName)
+async function getDefaultMessage(message, channelName)
 {
-	let message = `Thanks for posting <@${messageObj.user}> - I'm just creating a thread for you to keep the channel tidy.`;
+	let defaultMessage = `Thanks for posting <@${message.user}> - I'm just creating a thread for you to keep the channel tidy.`;
 	let showButtons = false; // By default don't add buttons
 	let id = null;
 	//console.debug("Calling to DB. Channel: " + channelName);
-	const results = await pool.query('SELECT id, response__c as response, show_buttons__c as show_buttons FROM salesforce.Slack_Message_Response__c WHERE is_channel_default__c = true AND Is_Active__c = true AND channel__c = $1;', [channelName]);
+	const results = await pool.query('SELECT response__c as response, show_buttons__c as show_buttons FROM salesforce.Slack_Message_Response__c WHERE is_channel_default__c = true AND Is_Active__c = true AND channel__c = $1;', [channelName]);
 	if (results.rows) {
 		console.debug("Found results for default message for channel: " + channelName);
 		for (let row of results.rows) {
 			id = row.id;
-			message = row.response;
-			message = message.replace("${messageObj.user}",messageObj.user);
-			console.debug("Set defaultMessage to: " + message);
+			defaultMessage = row.response;
+			defaultMessage = defaultMessage.replace("${message.user}",message.user);
+			console.debug("Set defaultMessage to: " + defaultMessage);
 			showButtons = row.show_buttons;
 			break;
 		}
 	}
 	// Return an inline object with the response and the show/hide buttons boolean value
-	return { id: id, response: message, showButtons: showButtons };
+	return { id: id, response: defaultMessage, showButtons: showButtons };
 }
 
 
@@ -205,7 +206,7 @@ async function incrementSentCount(messageId) {
 async function incrementSuccessCount(messageId) {
 	if (messageId)
 	{
-		const results = await pool.query('UPDATE salesforce.Slack_Message_Response__c SET success__c = success__c + 1 WHERE id = $1;', [messageId]);
+		//const results = await pool.query('UPDATE salesforce.Slack_Message_Response__c SET success__c = success__c + 1 WHERE id = $1;', [messageId]);
 	}
 	
 }
@@ -214,7 +215,7 @@ async function incrementSuccessCount(messageId) {
 async function incrementFailCount(messageId) {
 	if (messageId)
 	{
-		const results = await pool.query('UPDATE salesforce.Slack_Message_Response__c SET fail__c = fail__c + 1 WHERE id = $1;', [messageId]);
+		//const results = await pool.query('UPDATE salesforce.Slack_Message_Response__c SET fail__c = fail__c + 1 WHERE id = $1;', [messageId]);
 	}
 	
 }
