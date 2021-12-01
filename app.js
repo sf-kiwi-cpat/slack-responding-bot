@@ -50,7 +50,7 @@ app.message('\?', async ({message, say}) => {
 			// Use the response value from the original DB search, but replace the username with the actual value
 			response = slackResponse.response.replace("${message.user}",message.user);
 			showButtons = slackResponse.show_buttons;
-			messageId slackResponse.id;
+			messageId = slackResponse.id;
 			break; 
 		}
 	    }
@@ -59,7 +59,7 @@ app.message('\?', async ({message, say}) => {
 		    let slackResponse = await getDefaultMessage(message,channelName);
 		    response = slackResponse.response;
 		    showButtons = slackResponse.showButtons;
-		    messageId slackResponse.id;
+		    messageId = slackResponse.id;
 	    }
 	    console.debug("showButtons:" + showButtons);
 	    sendReply(message, say, response, showButtons);
