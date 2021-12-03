@@ -36,7 +36,7 @@ const BOT_RESPONSE_HELPED_BUTTON = ":white_check_mark: Thanks, I found my answer
 const BOT_RESPONSE_DIDNT_HELP_BUTTON = "I searched but still need help";
 
 // Listens to all incoming messages that contain a ? in them - this is what is fired when a Slack message is sent in a channel this app is in.
-app.message('\?', async ({message, say}) => {
+app.message('.', async ({message, say}) => {
     // We don't care about messages sent within a thread, only reply to top level messages. So if the message has a thread_ts then ignore it
     if (!message.thread_ts && !message.hidden) {
 	let channelName = await getChannelName(message.channel);
