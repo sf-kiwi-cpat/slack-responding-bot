@@ -69,8 +69,8 @@ app.message(async ({message, say}) => {
 			response = slackResponse.response;
 			showButtons = slackResponse.showButtons;
 			messageId = slackResponse.id;
-			successButtonLabel = slackResponse.success_label ? slackResponse.success_label : BOT_RESPONSE_HELPED_BUTTON;
-			failButtonLabel = slackResponse.fail_label ? slackResponse.fail_label : BOT_RESPONSE_DIDNT_HELP_BUTTON;
+			successButtonLabel = slackResponse.successLabel ? slackResponse.successLabel : BOT_RESPONSE_HELPED_BUTTON;
+			failButtonLabel = slackResponse.failLabel ? slackResponse.failLabel : BOT_RESPONSE_DIDNT_HELP_BUTTON;
 	    	}
 	    }
 	    //console.debug("showButtons:" + showButtons);
@@ -104,7 +104,7 @@ async function getDefaultMessage(message, channelName)
 			defaultMessage = row.response;
 			defaultMessage = defaultMessage.replace("${message.user}",message.user);
 			console.debug("Set defaultMessage to: " + defaultMessage);
-			returnObj = { id: row.id, response: defaultMessage, showButtons: row.show_buttons };
+			returnObj = { id: row.id, response: defaultMessage, showButtons: row.show_buttons, successLabel: row.success_label, failLabel: row.fail_label };
 			break;
 		}
 	}
