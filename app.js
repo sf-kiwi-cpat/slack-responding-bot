@@ -221,7 +221,7 @@ async function incrementSentCount(messageId) {
 async function incrementSuccessCount(messageId) {
 	if (messageId)
 	{
-		//const results = await pool.query('UPDATE salesforce.Slack_Message_Response__c SET success__c = success__c + 1 WHERE id = $1;', [messageId]);
+		const results = await pool.query('UPDATE salesforce.Slack_Message_Response__c SET success__c = success__c + 1 WHERE id = $1;', [messageId]);
 	}
 	
 }
@@ -230,7 +230,7 @@ async function incrementSuccessCount(messageId) {
 async function incrementFailCount(messageId) {
 	if (messageId)
 	{
-		//const results = await pool.query('UPDATE salesforce.Slack_Message_Response__c SET fail__c = fail__c + 1 WHERE id = $1;', [messageId]);
+		const results = await pool.query('UPDATE salesforce.Slack_Message_Response__c SET fail__c = fail__c + 1 WHERE id = $1;', [messageId]);
 	}
 	
 }
@@ -239,27 +239,31 @@ async function incrementFailCount(messageId) {
 app.action('button_click_answered', async ({body, ack, say}) => {
     // Acknowledge the action
     await ack();
-    handleButtonClick(body, say, BOT_RESPONSE_HELPED, BOT_RESPONSE_HELPED_EMOTICON);
+    handleButtonClick(body, say, true);
 });
 
 // Called after the 'I still need help' button is clicked.
 app.action('button_click_question', async ({body, ack, say }) => {
     // Acknowledge the action
     await ack();
-    handleButtonClick(body, say, BOT_RESPONSE_DIDNT_HELP, BOT_RESPONSE_DIDNT_HELP_EMOTICON);
+    handleButtonClick(body, say, false);
 });
 
 // Handles the button clicks to send a reply in the thread, react to the original post and remove the buttons from the first reply
-async function handleButtonClick(body, say, message, reaction) {
+async function handleButtonClick(body, say, success) {
 	//console.debug(body);
-	var threadTs;
+	let threadTs, messageId = null;
 	if (body.message && body.message.thread_ts) {
 	    threadTs = body.message.thread_ts;
 	} else if (body.message) {
 	    threadTs = body.message.ts;
 	}
+	messageId = await getOriginalMessageId(threadTs);
+	
+	let responseObj = await getButtonResponse(success, messageId);
+	
 	await say({
-	    text: message,
+	    text: responseObj.text,
 	    thread_ts: threadTs
 	});
 	
@@ -267,7 +271,7 @@ async function handleButtonClick(body, say, message, reaction) {
 	    // Call reactions.add with the built-in client
 	    const reactionResult = await web.reactions.add({
 		channel: body.channel.id,
-		name: reaction,
+		name: responseObj.icon,
 		timestamp: threadTs
 	    });
 	} catch (error) {
@@ -286,6 +290,23 @@ async function handleButtonClick(body, say, message, reaction) {
 	    console.error(error);
 	}
 }
+
+async function getButtonResponse(success, messageId)
+{
+	let responseObj = null; 
+	if (success)
+	{
+		incrementSuccessCount(messageId);
+		responseObj = { text: BOT_RESPONSE_HELPED, icon: BOT_RESPONSE_HELPED_EMOTICON};
+	}
+	else
+	{
+		incrementFailCount(messageId);
+		responseObj = { text: BOT_RESPONSE_DIDNT_HELP, icon: BOT_RESPONSE_DIDNT_HELP_EMOTICON};;
+	}
+	return responseObj;
+}
+
 
 async function getOriginalMessageId(threadTs) {
 	// Go get the list of regular expressions for this slack channel
