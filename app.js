@@ -83,7 +83,7 @@ async function logMessage(message, messageId) {
 	{
 		messageString = message.text.substring(0,1997) + '...';
 	}
-	const results = await pool.query('INSERT INTO salesforce.slack_message_info(response_id, thread_ts, slack_message VALUES ($1, $2, $3);', [messageId, message.thread_ts, messageString]);
+	const results = await pool.query('INSERT INTO salesforce.slack_message_info(response_id, thread_ts, slack_message) VALUES ($1, $2, $3);', [messageId, message.thread_ts, messageString]);
 }
 
 // Get the default message as the fallback for a channel.
