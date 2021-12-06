@@ -83,7 +83,7 @@ async function logMessage(message, messageId) {
 	{
 		messageString = message.text.substring(0,1997) + '...';
 	}
-	const results = await pool.query('INSERT INTO salesforce.slack_message_info(response_id, thread_ts, slack_message) VALUES ($1, $2, $3);', [messageId, message.thread_ts, messageString]);
+	const results = await pool.query('INSERT INTO salesforce.slack_message_info(response_id, thread_ts, slack_message) VALUES ($1, $2, $3);', [messageId, message.ts, messageString]);
 }
 
 // Get the default message as the fallback for a channel.
@@ -249,7 +249,6 @@ app.action('button_click_question', async ({body, ack, say }) => {
     handleButtonClick(body, say, BOT_RESPONSE_DIDNT_HELP, BOT_RESPONSE_DIDNT_HELP_EMOTICON);
 });
 
-
 // Handles the button clicks to send a reply in the thread, react to the original post and remove the buttons from the first reply
 async function handleButtonClick(body, say, message, reaction) {
 	//console.debug(body);
@@ -286,6 +285,18 @@ async function handleButtonClick(body, say, message, reaction) {
 	} catch (error) {
 	    console.error(error);
 	}
+}
+
+async function getOriginalMessageId(threadTs) {
+	// Go get the list of regular expressions for this slack channel
+	let responseList,messageId = null;
+	//console.debug("Calling to DB. Channel: " + channelName);
+	const results = await pool.query('SELECT response_id FROM salesforce.slack_message_info WHERE thread_ts = $1;', [threadTs]);
+	if (results.rows) {
+		messageId = results.rows[0].response_id;
+	}
+
+	return messageId;
 }
 
 
