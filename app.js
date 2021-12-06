@@ -72,9 +72,13 @@ app.message(async ({message, say}) => {
 		sendReply(message, say, response, showButtons);
 	    	incrementSentCount(messageId);
 	    }
+	    logMessage(message,messageId);
     }
 });
 
+async function logMessage(message, messageId) {
+	const results = await pool.query('INSERT INTO salesforce.slack_message_info(response_id, thread_ts, slack_message VALUES ($1, $2, $3);', messageId, message.thread_ts, message.text.left(2000));
+}
 
 // Get the default message as the fallback for a channel.
 async function getDefaultMessage(message, channelName)
