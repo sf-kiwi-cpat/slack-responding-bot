@@ -303,13 +303,37 @@ async function getButtonResponse(success, messageId)
 	if (success)
 	{
 		incrementSuccessCount(messageId);
+		// Set default in case values aren't set later
 		responseObj = { text: BOT_RESPONSE_HELPED, icon: BOT_RESPONSE_HELPED_EMOTICON};
 	}
 	else
 	{
 		incrementFailCount(messageId);
+		// Set default in case values aren't set later
 		responseObj = { text: BOT_RESPONSE_DIDNT_HELP, icon: BOT_RESPONSE_DIDNT_HELP_EMOTICON};;
 	}
+	
+	if (messageId)
+	{
+		// Go get response and reaction for the message that was sent before
+		const results = await pool.query('SELECT Success_Response_Reaction__c as success_reaction, Success_Response_Message__c as success_message, Fail_Response_Reaction__c as fail_reaction, Fail_Response_Message__c as fail_message FROM salesforce.Slack_Message_Response__c WHERE Id = $1;', [messageId]);
+		if (results.rows) {
+			let slackResponse = results.rows[0];
+			if (slackResponse && success)
+			{
+				responseObj.text = slackResponse.success_message;
+				responseObj.icon = slackResponse.success_reaction;
+			}
+			else if (slackResponse)
+			{
+				responseObj.text = slackResponse.fail_message;
+				responseObj.icon = slackResponse.fail_reaction;
+			}
+			
+		}
+
+	}
+	
 	return responseObj;
 }
 
