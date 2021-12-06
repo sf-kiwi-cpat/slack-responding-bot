@@ -58,16 +58,20 @@ app.message(async ({message, say}) => {
 			break; 
 		}
 	    }
-	    // If we didn't set a response above then get the default.
+	    // If we didn't set a response above then get the default if there is one
 	    if (!response) {
-		    let slackResponse = await getDefaultMessage(message,channelName);
-		    response = slackResponse.response;
-		    showButtons = slackResponse.showButtons;
-		    messageId = slackResponse.id;
+		let slackResponse = await getDefaultMessage(message,channelName);
+		if (slackResponse) {
+			response = slackResponse.response;
+			showButtons = slackResponse.showButtons;
+			messageId = slackResponse.id;
+	    	}
 	    }
 	    //console.debug("showButtons:" + showButtons);
-	    sendReply(message, say, response, showButtons);
-	    incrementSentCount(messageId);
+	    if (response) {
+		sendReply(message, say, response, showButtons);
+	    	incrementSentCount(messageId);
+	    }
     }
 });
 
@@ -75,24 +79,21 @@ app.message(async ({message, say}) => {
 // Get the default message as the fallback for a channel.
 async function getDefaultMessage(message, channelName)
 {
-	let defaultMessage = `Thanks for posting <@${message.user}> - I'm just creating a thread for you to keep the channel tidy.`;
-	let showButtons = false; // By default don't add buttons
-	let id = null;
+	let defaultMessage, returnObj = null;
 	//console.debug("Calling to DB. Channel: " + channelName);
 	const results = await pool.query('SELECT id, response__c as response, show_buttons__c as show_buttons FROM salesforce.Slack_Message_Response__c WHERE is_channel_default__c = true AND Is_Active__c = true AND channel__c = $1;', [channelName]);
 	if (results.rows) {
 		console.debug("Found results for default message for channel: " + channelName);
 		for (let row of results.rows) {
-			id = row.id;
 			defaultMessage = row.response;
 			defaultMessage = defaultMessage.replace("${message.user}",message.user);
 			console.debug("Set defaultMessage to: " + defaultMessage);
-			showButtons = row.show_buttons;
+			returnObj = { id: row.id, response: defaultMessage, showButtons: row.show_buttons };
 			break;
 		}
 	}
 	// Return an inline object with the response and the show/hide buttons boolean value
-	return { id: id, response: defaultMessage, showButtons: showButtons };
+	return returnObj; 
 }
 
 
