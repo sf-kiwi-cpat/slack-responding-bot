@@ -264,15 +264,19 @@ async function handleButtonClick(body, say, success) {
 	} else if (body.message) {
 	    threadTs = body.message.ts;
 	}
+	// Go find the original Message that was sent as the reply for this thread
 	messageId = await getOriginalMessageId(threadTs);
 	
+	// Use that message ID to get the response that we should send back to the user after this button click
 	let responseObj = await getButtonResponse(success, messageId);
 	
+	// Send the response in thread
 	await say({
 	    text: responseObj.text,
 	    thread_ts: threadTs
 	});
 	
+	// Add the configured reaction to the original message
 	try {
 	    // Call reactions.add with the built-in client
 	    const reactionResult = await web.reactions.add({
@@ -297,22 +301,27 @@ async function handleButtonClick(body, say, success) {
 	}
 }
 
+// Returns what to response to the button click with based on the button and the original response
 async function getButtonResponse(success, messageId)
 {
 	let responseObj = null; 
 	if (success)
 	{
+		// Update the counter in the DB for this message ID
 		incrementSuccessCount(messageId);
 		// Set default in case values aren't set later
 		responseObj = { text: BOT_RESPONSE_HELPED, icon: BOT_RESPONSE_HELPED_EMOTICON};
 	}
 	else
 	{
+		
+		// Update the counter in the DB for this message ID
 		incrementFailCount(messageId);
 		// Set default in case values aren't set later
 		responseObj = { text: BOT_RESPONSE_DIDNT_HELP, icon: BOT_RESPONSE_DIDNT_HELP_EMOTICON};;
 	}
 	
+	// If we passed a message, go get it's values from the DB
 	if (messageId)
 	{
 		// Go get response and reaction for the message that was sent before
@@ -321,11 +330,13 @@ async function getButtonResponse(success, messageId)
 			let slackResponse = results.rows[0];
 			if (slackResponse && success)
 			{
+				// Success responses
 				responseObj.text = slackResponse.success_message;
 				responseObj.icon = slackResponse.success_reaction;
 			}
 			else if (slackResponse)
 			{
+				// Failed responses
 				responseObj.text = slackResponse.fail_message;
 				responseObj.icon = slackResponse.fail_reaction;
 			}
@@ -337,13 +348,13 @@ async function getButtonResponse(success, messageId)
 	return responseObj;
 }
 
-
+// Goes and finds the original messageID that was sent as a reply in this thread
 async function getOriginalMessageId(threadTs) {
 	// Go get the list of regular expressions for this slack channel
-	let responseList,messageId = null;
+	let messageId = null;
 	//console.debug("Calling to DB. Channel: " + channelName);
 	const results = await pool.query('SELECT response_id FROM salesforce.slack_message_info WHERE thread_ts = $1;', [threadTs]);
-	if (results.rows) {
+	if (results.rows && results.rows[0]) {
 		messageId = results.rows[0].response_id;
 	}
 
