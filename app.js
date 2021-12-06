@@ -45,6 +45,8 @@ app.message(async ({message, say}) => {
 	let responseList = await getSlackResponsesForChannel(channelName);
 	    // Get the default response in case we don't match any of the things to check for above
 	    let response, messageId = null;
+	    let successButtonLabel = BOT_RESPONSE_HELPED_BUTTON;
+	    let failButtonLabel = BOT_RESPONSE_DIDNT_HELP_BUTTON;
 	    let showButtons = true; // determines if the buttons are shown after the message or not
 	    // Now check each regular expression and see if it is in the message sent in
 	    for (let slackResponse of responseList) {
@@ -55,6 +57,8 @@ app.message(async ({message, say}) => {
 			response = slackResponse.response.replace("${message.user}",message.user);
 			showButtons = slackResponse.show_buttons;
 			messageId = slackResponse.id;
+			successButtonLabel = slackResponse.success_label ? slackResponse.success_label : BOT_RESPONSE_HELPED_BUTTON;
+			failButtonLabel = slackResponse.fail_label ? slackResponse.fail_label : BOT_RESPONSE_DIDNT_HELP_BUTTON;
 			break; 
 		}
 	    }
@@ -65,11 +69,13 @@ app.message(async ({message, say}) => {
 			response = slackResponse.response;
 			showButtons = slackResponse.showButtons;
 			messageId = slackResponse.id;
+			successButtonLabel = slackResponse.success_label ? slackResponse.success_label : BOT_RESPONSE_HELPED_BUTTON;
+			failButtonLabel = slackResponse.fail_label ? slackResponse.fail_label : BOT_RESPONSE_DIDNT_HELP_BUTTON;
 	    	}
 	    }
 	    //console.debug("showButtons:" + showButtons);
 	    if (response) {
-		sendReply(message, say, response, showButtons);
+		sendReply(message, say, response, showButtons, successButtonLabel, failButtonLabel);
 	    	incrementSentCount(messageId);
 	    }
 	    logMessage(message,messageId);
@@ -91,7 +97,7 @@ async function getDefaultMessage(message, channelName)
 {
 	let defaultMessage, returnObj = null;
 	//console.debug("Calling to DB. Channel: " + channelName);
-	const results = await pool.query('SELECT id, response__c as response, show_buttons__c as show_buttons FROM salesforce.Slack_Message_Response__c WHERE is_channel_default__c = true AND Is_Active__c = true AND channel__c = $1;', [channelName]);
+	const results = await pool.query('SELECT id, response__c as response, show_buttons__c as show_buttons, success_button_label__c as success_label, fail_button_label__c as fail_label FROM salesforce.Slack_Message_Response__c WHERE is_channel_default__c = true AND Is_Active__c = true AND channel__c = $1;', [channelName]);
 	if (results.rows) {
 		console.debug("Found results for default message for channel: " + channelName);
 		for (let row of results.rows) {
@@ -115,7 +121,7 @@ async function getSlackResponsesForChannel(channelName)
 	// Go get the list of regular expressions for this slack channel
 	let responseList = null;
 	//console.debug("Calling to DB. Channel: " + channelName);
-	const results = await pool.query('SELECT id, regular_expression__c as regex, response__c as response, show_buttons__c as show_buttons FROM salesforce.Slack_Message_Response__c WHERE regular_expression__c IS NOT NULL AND Is_Active__c = true AND channel__c = $1;', [channelName]);
+	const results = await pool.query('SELECT id, regular_expression__c as regex, response__c as response, show_buttons__c as show_buttons, success_button_label__c as success_label, fail_button_label__c as fail_label FROM salesforce.Slack_Message_Response__c WHERE regular_expression__c IS NOT NULL AND Is_Active__c = true AND channel__c = $1;', [channelName]);
 	if (results.rows) {
 		console.debug("Found results for slack responses for channel: "+ channelName);
 		responseList = results.rows;
@@ -144,7 +150,7 @@ async function getChannelName(channelId)
 }
 
 // Function that actually sends the reply, ensures it is threaded and includes buttons to respond/interact with.
-async function sendReply(message, say, phrase, showButtons) {
+async function sendReply(message, say, phrase, showButtons, successButtonLabel, failButtonLabel) {
     // Get the thread timestamp so we can reply in thread
     var threadTs;
     if (message.thread_ts) {
@@ -170,7 +176,7 @@ async function sendReply(message, say, phrase, showButtons) {
 				"style": "primary",
 				"text": {
 				    "type": "plain_text",
-				    "text": BOT_RESPONSE_HELPED_BUTTON,
+				    "text": successButtonLabel,
 				    "emoji": true
 				},
 				"action_id": "button_click_answered"
@@ -180,7 +186,7 @@ async function sendReply(message, say, phrase, showButtons) {
 				"style": "danger",
 				"text": {
 				    "type": "plain_text",
-				    "text": BOT_RESPONSE_DIDNT_HELP_BUTTON,
+				    "text": failButtonLabel,
 				    "emoji": true
 				},
 				"action_id": "button_click_question"
