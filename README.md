@@ -4,7 +4,7 @@
 
 ## Overview
 
-This app listens to Slack messages sent within Slack channels it is added to, and responds in thread as appropriate. To determine the response to send, it looks up previously configured 'Slack Message Responses' for that channel, runs the associated regular expression for that response against the message sent, and if it matches, responds accordingly.
+This app listens to Slack messages sent within public Slack channels it is added to, and responds in thread as appropriate. To determine the response to send, it looks up previously configured 'Slack Message Responses' for that channel, runs the associated regular expression for that response against the message sent, and if it matches, responds accordingly.
 
 The 'Slack Message Responses' are configured as a Custom Object in a Salesforce Org - these are accessed by the app via a Postgres database, which is updated via Heroku Connect.
 
@@ -42,7 +42,7 @@ The app will also response with a message in the thread as appropriate - either 
 
 ### Adding a new Channel
 
-To add a new channel, you will first need to add responses to the Salesforce Org. The easiest way is to enter them into [this Spreadsheet][3] - you can then let Craig Paterson know and he can load them into the appropriate org.
+To add a new channel, you will first need to add responses to the Salesforce Org. Please review [this video][3] which will give you instructions on how to start using the Selling Assistant. It will point you to [this Spreadsheet][4] - you can then let Craig Paterson know and he can give you access to the org.
 
 Once they are in there, you can add the bot to your channel through Slack, and it should start responding to any questions posted. 
 
@@ -52,8 +52,10 @@ Once they are in there, you can add the bot to your channel through Slack, and i
 
 
 #### Notes
-This is a Slack app built with the [Bolt for JavaScript framework][1] that is deployed to the [Heroku platform][2].
+This is a Slack app built with the [Bolt for JavaScript framework][1] that is deployed to the [Heroku platform][2]. 
+To support private channels, the App needs the 'groups:history' and 'groups:read' scopes to be added, and also needs to subscribe to the 'message.groups' Event.
 
 [1]: https://slack.dev/bolt-js/
 [2]: https://heroku.com/
-[3]: https://docs.google.com/spreadsheets/d/1euE3hOFdM6R2rd57g3Gjo_b-oewtctE_LcPvOrMn3Z0/edit#gid=0
+[3]: https://drive.google.com/file/d/103wcfG4x49zLoHlGaLqmdRZM6EDJ0uvJ/view?usp=sharing
+[4]: https://docs.google.com/spreadsheets/d/1MD-XbSI8uJzEmr7-wORY1RjdpR-5pdRBrDFbQA7b18Q/edit?usp=sharing
