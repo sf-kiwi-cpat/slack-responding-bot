@@ -42,37 +42,36 @@ app.event('app_home_opened', async ({ event, client, context }) => {
         callback_id: 'home_view',
 
         /* body of the view */
-        blocks: [
-          {
-            "type": "section",
-            "text": {
-              "type": "mrkdwn",
-              "text": "*Welcome to your _App's Home_* :tada:"
-            }
-          },
-          {
-            "type": "divider"
-          },
-          {
-            "type": "section",
-            "text": {
-              "type": "mrkdwn",
-              "text": "This button won't do much for now but you can set up a listener for it using the `actions()` method and passing its unique `action_id`. See an example in the `examples` folder within your Bolt app."
-            }
-          },
-          {
-            "type": "actions",
-            "elements": [
-              {
-                "type": "button",
-                "text": {
-                  "type": "plain_text",
-                  "text": "Click me!"
-                }
-              }
-            ]
-          }
-        ]
+        "blocks": [
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Hi David :wave:"
+			}
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Great to see you here! This App that helps Sales teams get answers faster, by responding to any questions asked in a channel to point the user to resources. These are just a few things which you will be able to do:"
+			}
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "• Starts a thread for each response \n • Use Regular Expressions to match the input and respond as appropriate \n • React to the original post based on whether the response answered the question."
+			}
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "But before you can do all these amazing things, responses will need to be setup by those that manage the Slack channel. To get started, <https://docs.google.com/spreadsheets/d/1MD-XbSI8uJzEmr7-wORY1RjdpR-5pdRBrDFbQA7b18Q/edit?usp=sharing|make a copy of this spreadsheet>. "
+			}
+		}
+	]
       }
     });
   }
