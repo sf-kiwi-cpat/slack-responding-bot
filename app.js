@@ -47,7 +47,7 @@ app.event('app_home_opened', async ({ event, client, context }) => {
 			"type": "section",
 			"text": {
 				"type": "mrkdwn",
-				"text": "Hi David :wave:"
+				"text": "Hi <@${message.user}> :wave:"
 			}
 		},
 		{
