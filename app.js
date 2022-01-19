@@ -47,7 +47,7 @@ app.event('app_home_opened', async ({ event, client, context }) => {
 			"type": "header",
 			"text": {
 				"type": "plain_text",
-				"text": "Hi there :wave:  \nGreat to see you here!",
+				"text": "Hi there <@${user_id}> :wave: ${user_id}  \nGreat to see you here!",
 				"emoji": true
 			}
 		},
