@@ -55,21 +55,21 @@ app.event('app_home_opened', async ({ event, client, context }) => {
 			"type": "section",
 			"text": {
 				"type": "mrkdwn",
-				"text": " This App that helps Sales teams get answers faster, by responding to any questions asked in a channel to point the user to resources. These are just a few things which you will be able to do:"
+				"text": " This App that helps Sales teams get answers faster, by responding to any questions asked in a channel to point the user to resources. \n\nThese are just a few things which you will be able to do:"
 			}
 		},
 		{
 			"type": "section",
 			"text": {
 				"type": "mrkdwn",
-				"text": "• Starts a thread for each response \n • Use Regular Expressions to match the input and respond as appropriate \n • React to the original post based on whether the response answered the question."
+				"text": "• Starts a thread for each response \n • Use Regular Expressions to match the input and respond as appropriate \n • React to the original post based on whether the response answered the question or not."
 			}
 		},
 		{
 			"type": "section",
 			"text": {
 				"type": "mrkdwn",
-				"text": "But before you can do all these amazing things, responses will need to be setup by those that manage the Slack channel. To get started, <https://docs.google.com/spreadsheets/d/1MD-XbSI8uJzEmr7-wORY1RjdpR-5pdRBrDFbQA7b18Q/edit?usp=sharing|make a copy of this spreadsheet>. "
+				"text": "But before you can do all these amazing things, responses will need to be setup by those that manage the Slack channel. \n\nTo get started, <https://docs.google.com/spreadsheets/d/1MD-XbSI8uJzEmr7-wORY1RjdpR-5pdRBrDFbQA7b18Q/edit?usp=sharing|make a copy of this spreadsheet>. "
 			}
 		}
 	]
