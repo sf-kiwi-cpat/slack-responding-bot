@@ -47,7 +47,7 @@ app.event('app_home_opened', async ({ event, client, context }) => {
 			"type": "header",
 			"text": {
 				"type": "plain_text",
-				"text": "Hi there <@${user_id}> :wave: ${user_id}  \nGreat to see you here!",
+				"text": "Hi there :wave:  \nGreat to see you here!",
 				"emoji": true
 			}
 		},
@@ -97,9 +97,7 @@ app.event('app_home_opened', async ({ event, client, context }) => {
 					"text": ":movie_camera: Learn More",
 					"emoji": true
 				},
-				"value": "click_me_123",
-				"url": "https://drive.google.com/file/d/103wcfG4x49zLoHlGaLqmdRZM6EDJ0uvJ/view?usp=sharing",
-				"action_id": "button-action"
+				"url": "https://drive.google.com/file/d/103wcfG4x49zLoHlGaLqmdRZM6EDJ0uvJ/view?usp=sharing"
 			}
 		},
 		{
@@ -118,9 +116,7 @@ app.event('app_home_opened', async ({ event, client, context }) => {
 					"text": ":spreadsheet: Open Spreadsheet",
 					"emoji": true
 				},
-				"value": "click_me_123",
-				"url": "https://docs.google.com/spreadsheets/d/1MD-XbSI8uJzEmr7-wORY1RjdpR-5pdRBrDFbQA7b18Q/edit?usp=sharing",
-				"action_id": "button-action"
+				"url": "https://docs.google.com/spreadsheets/d/1MD-XbSI8uJzEmr7-wORY1RjdpR-5pdRBrDFbQA7b18Q/edit?usp=sharing"
 			}
 		},
 		{
