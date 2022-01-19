@@ -44,17 +44,18 @@ app.event('app_home_opened', async ({ event, client, context }) => {
         /* body of the view */
         "blocks": [
 		{
-			"type": "section",
+			"type": "header",
 			"text": {
-				"type": "mrkdwn",
-				"text": "Hi <@${message.user}> :wave:"
+				"type": "plain_text",
+				"text": "Hi there :wave:  \nGreat to see you here!",
+				"emoji": true
 			}
 		},
 		{
 			"type": "section",
 			"text": {
 				"type": "mrkdwn",
-				"text": "Great to see you here! This App that helps Sales teams get answers faster, by responding to any questions asked in a channel to point the user to resources. These are just a few things which you will be able to do:"
+				"text": " This App that helps Sales teams get answers faster, by responding to any questions asked in a channel to point the user to resources. These are just a few things which you will be able to do:"
 			}
 		},
 		{
