@@ -225,7 +225,7 @@ async function getSlackResponsesForChannel(channelName)
 	// Go get the list of regular expressions for this slack channel
 	let responseList = null;
 	//console.debug("Calling to DB. Channel: " + channelName);
-	const results = await pool.query('SELECT id, regular_expression__c as regex, response__c as response, show_buttons__c as show_buttons, success_button_label__c as success_label, fail_button_label__c as fail_label FROM salesforce.Slack_Message_Response__c WHERE regular_expression__c IS NOT NULL AND Is_Active__c = true AND channel__c = $1;', [channelName]);
+	const results = await pool.query('SELECT id, regular_expression__c as regex, response__c as response, show_buttons__c as show_buttons, success_button_label__c as success_label, fail_button_label__c as fail_label FROM salesforce.Slack_Message_Response__c WHERE regular_expression__c IS NOT NULL AND Is_Active__c = true AND channel__c = $1; ORDER BY ORDER__c', [channelName]);
 	if (results.rows) {
 		console.debug("Found results for slack responses for channel: "+ channelName);
 		responseList = results.rows;
