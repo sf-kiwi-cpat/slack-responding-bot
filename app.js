@@ -397,8 +397,13 @@ async function handleButtonClick(body, say, success) {
 	    const updateResult = await web.chat.update({
 		channel: body.channel.id,
 		ts: body.message.ts,
-		text: body.message.text,
-		blocks: []
+		blocks: [{
+			"type": "section",
+			"text": {
+			    "type": "mrkdwn",
+			    "text": body.message.text
+			}
+		    }]
 	    });
 	} catch (error) {
 	    console.error(error);
