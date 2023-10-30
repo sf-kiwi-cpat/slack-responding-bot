@@ -362,7 +362,7 @@ app.action('button_click_question', async ({body, ack, say }) => {
 // Handles the button clicks to send a reply in the thread, react to the original post and remove the buttons from the first reply
 async function handleButtonClick(body, say, success) {
 	//console.debug(body);
-	let threadTs, messageId = null;
+	let threadTs, messageId, originalMessageText = null;
 	if (body.message && body.message.thread_ts) {
 	    threadTs = body.message.thread_ts;
 	} else if (body.message) {
@@ -370,6 +370,7 @@ async function handleButtonClick(body, say, success) {
 	}
 	// Go find the original Message that was sent as the reply for this thread
 	messageId = await getOriginalMessageId(threadTs);
+	originalMessageText = await getOriginalMessageText(threadTs);
 	
 	// Use that message ID to get the response that we should send back to the user after this button click
 	let responseObj = await getButtonResponse(success, messageId);
@@ -401,7 +402,7 @@ async function handleButtonClick(body, say, success) {
 			"type": "section",
 			"text": {
 			    "type": "mrkdwn",
-			    "text": body.message.text
+			    "text": originalMessageText
 			}
 		    }]
 	    });
@@ -461,7 +462,7 @@ async function getButtonResponse(success, messageId)
 async function getOriginalMessageId(threadTs) {
 	// Go get the list of regular expressions for this slack channel
 	let messageId = null;
-	//console.debug("Calling to DB. Channel: " + channelName);
+	//console.debug("Calling to DB. threadTS: " + threadTS);
 	const results = await pool.query('SELECT response_id FROM salesforce.slack_message_info WHERE thread_ts = $1;', [threadTs]);
 	if (results.rows && results.rows[0]) {
 		messageId = results.rows[0].response_id;
@@ -470,6 +471,18 @@ async function getOriginalMessageId(threadTs) {
 	return messageId;
 }
 
+// Goes and finds the original messageID that was sent as a reply in this thread
+async function getOriginalMessageText(threadTs) {
+	// Go get the list of regular expressions for this slack channel
+	let messageText = null;
+	//console.debug("Calling to DB. threadTS: " + threadTS);
+	const results = await pool.query('SELECT slack_message FROM salesforce.slack_message_info WHERE thread_ts = $1;', [threadTs]);
+	if (results.rows && results.rows[0]) {
+		messageText = results.rows[0].response_id;
+	}
+
+	return messageText;
+}
 
 // Code that runs on start-up of the app.
 (async () => {
