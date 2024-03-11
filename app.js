@@ -181,8 +181,9 @@ app.message(async ({message, say}) => {
 	    if (response) {
 		sendReply(message, say, response, showButtons, successButtonLabel, failButtonLabel);
 	    	incrementSentCount(messageId);
+		logMessage(message,messageId);
 	    }
-	    logMessage(message,messageId);
+	    
     }
 });
 
